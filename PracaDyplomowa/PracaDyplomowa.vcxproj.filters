@@ -166,19 +166,19 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\packages\nupengl.core.0.0.0.1\build\native\lib\Win32\v120\freeglut.lib">
-      <Filter>Resource Files</Filter>
-    </Library>
-    <Library Include="..\packages\nupengl.core.0.0.0.1\build\native\lib\Win32\v120\glew32.lib">
-      <Filter>Resource Files</Filter>
-    </Library>
-    <Library Include="..\packages\nupengl.core.0.0.0.1\build\native\lib\Win32\v120\glfw3dll.lib">
-      <Filter>Resource Files</Filter>
-    </Library>
     <Library Include="..\packages\Assimp.3.0.0\build\native\lib\Win32\assimp.lib">
       <Filter>Resource Files</Filter>
     </Library>
     <Library Include="..\packages\freeimage.3.16.0\build\native\lib\Win32\dynamic\FreeImage.lib">
+      <Filter>Resource Files</Filter>
+    </Library>
+    <Library Include="..\packages\nupengl.core.0.1.0.1\build\native\lib\Win32\freeglut.lib">
+      <Filter>Resource Files</Filter>
+    </Library>
+    <Library Include="..\packages\nupengl.core.0.1.0.1\build\native\lib\Win32\glew32.lib">
+      <Filter>Resource Files</Filter>
+    </Library>
+    <Library Include="..\packages\nupengl.core.0.1.0.1\build\native\lib\Win32\glfw3dll.lib">
       <Filter>Resource Files</Filter>
     </Library>
   </ItemGroup>

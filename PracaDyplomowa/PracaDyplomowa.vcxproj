@@ -209,9 +209,9 @@
   <ItemGroup>
     <Library Include="..\packages\Assimp.3.0.0\build\native\lib\Win32\assimp.lib" />
     <Library Include="..\packages\freeimage.3.16.0\build\native\lib\Win32\dynamic\FreeImage.lib" />
-    <Library Include="..\packages\nupengl.core.0.0.0.1\build\native\lib\Win32\v120\freeglut.lib" />
-    <Library Include="..\packages\nupengl.core.0.0.0.1\build\native\lib\Win32\v120\glew32.lib" />
-    <Library Include="..\packages\nupengl.core.0.0.0.1\build\native\lib\Win32\v120\glfw3dll.lib" />
+    <Library Include="..\packages\nupengl.core.0.1.0.1\build\native\lib\Win32\freeglut.lib" />
+    <Library Include="..\packages\nupengl.core.0.1.0.1\build\native\lib\Win32\glew32.lib" />
+    <Library Include="..\packages\nupengl.core.0.1.0.1\build\native\lib\Win32\glfw3dll.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
