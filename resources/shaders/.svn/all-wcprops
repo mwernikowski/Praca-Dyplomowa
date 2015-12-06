@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/rmnp/!svn/ver/286/glgame4/oglApplication/shaders
+END
+test.ps
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/rmnp/!svn/ver/284/glgame4/oglApplication/shaders/test.ps
+END
+tmo.ps
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rmnp/!svn/ver/286/glgame4/oglApplication/shaders/tmo.ps
+END
+spriteDraw.ps
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/rmnp/!svn/ver/285/glgame4/oglApplication/shaders/spriteDraw.ps
+END
+test.vs
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/rmnp/!svn/ver/284/glgame4/oglApplication/shaders/test.vs
+END
+tmo.vs
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/rmnp/!svn/ver/286/glgame4/oglApplication/shaders/tmo.vs
+END
+spriteDraw.vs
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/rmnp/!svn/ver/285/glgame4/oglApplication/shaders/spriteDraw.vs
+END
