@@ -7,7 +7,6 @@ uniform sampler2D mask;
 out vec3 outputColor;
 
 void main() {
-	vec3 luminanceConvert = vec3(0.212656, 0.715158, 0.072186);
-	double luminance = dot(texture2D(tex, TexCoord).rgb, luminanceConvert);
+	double luminance = texture2D(tex, TexCoord).r + texture2D(tex, TexCoord).g + texture2D(tex, TexCoord).b;
 	outputColor = vec3(texture(mask, TexCoord).r * luminance, texture(mask, TexCoord).r, 0);
 }

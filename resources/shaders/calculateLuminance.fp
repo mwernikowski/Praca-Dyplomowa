@@ -9,9 +9,8 @@ out vec3 outputColor;
 
 void main()
 {
-	float delta = 1e-5;
-	float oldLuminance = texture(oldTexture, TexCoord, 20).r / (texture(oldTexture, TexCoord, 20).g + delta);
-	float aimLuminance = texture(aimTexture, TexCoord, 20).r / (texture(aimTexture, TexCoord, 20).g + delta);
+	float oldLuminance = texture(oldTexture, TexCoord, 20).r / texture(oldTexture, TexCoord, 20).g;
+	float aimLuminance = texture(aimTexture, TexCoord, 20).r / texture(aimTexture, TexCoord, 20).g;
 
 	float logE10 = 2.302585;
 

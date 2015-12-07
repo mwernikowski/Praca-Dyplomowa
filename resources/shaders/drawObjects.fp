@@ -5,9 +5,7 @@ in vec3 Normal;
 in vec4 xPosition;
 
 uniform sampler2D tex;
-uniform sampler2D shadow;
 uniform vec3 LightPosition;
-uniform vec3 EyePosition;
 uniform vec3 matColor;
 uniform float mode;
 uniform float lightOn;
@@ -30,7 +28,7 @@ void main()
 	}
 	else if (mode == 10.0f)
 	{
-		outputColor = vec4(5.0f, 5.0f, 5.0f, 0.0f) + spec;
+		outputColor = vec4(5.0f, 5.0f, 5.0f, 1.0f) + spec;
 	}
 
 	if (lightOn < 1.0f) {
@@ -43,6 +41,15 @@ void main()
 	float visibility = 1.0f;
 	//if (texture2D(shadow, TexCoord).x < 1)
 	//	visibility = 0.2f;
+	vec3 luminanceConvert = vec3(0.212656, 0.715158, 0.072186);
 
-	outputColor *= visibility;
+	float luminance = dot(outputColor.rgb, luminanceConvert);
+
+	outputColor.r = luminance / 3.0f;
+
+	luminance -= outputColor.r;
+
+	outputColor.g = luminance / 2.0f;
+
+	outputColor.b -= luminance - outputColor.g; 
 }

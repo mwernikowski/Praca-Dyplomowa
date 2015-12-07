@@ -205,18 +205,19 @@ void Game::Redraw()
 {
 	setDeltaTime();
 
-	renderTarget1->SetRenderTarget();
-	objectsDrawer->Apply();
-	drawSceneObjects(objectsDrawer);
-
 	renderTarget2->SetRenderTarget();
 	maskGenerator->Apply();
 	maskGenerator->GetParameter("x")->SetValue(mousePosition.x / WINDOW_WIDTH);
 	maskGenerator->GetParameter("y")->SetValue(1.0f - mousePosition.y / WINDOW_HEIGHT);
 	maskGenerator->GetParameter("width")->SetValue((float)WINDOW_WIDTH);
 	maskGenerator->GetParameter("height")->SetValue((float)WINDOW_HEIGHT);
-	maskGenerator->GetParameter("fov")->SetValue(78.0f);
+	maskGenerator->GetParameter("fov")->SetValue(2.0f);
 	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, maskGenerator->GetParameter("World"));
+	renderTarget2->createMipmaps();
+
+	renderTarget1->SetRenderTarget();
+	objectsDrawer->Apply();
+	drawSceneObjects(objectsDrawer);
 
 	renderTarget3->SetRenderTarget();
 	maskMultiplier->Apply();
@@ -240,7 +241,8 @@ void Game::Redraw()
 	luminanceCalculator->GetParameter("aimTexture")->SetValue(*renderTarget3);
 	luminanceCalculator->GetParameter("deltaTime")->SetValue(deltaTime);
 	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, luminanceCalculator->GetParameter("World"));
-
+	renderTarget2->createMipmaps();
+	
 	currentLuminance->SetRenderTarget();
 	textureCopier->Apply();
 	textureCopier->GetParameter("tex")->SetValue(*renderTarget2);

@@ -34,7 +34,7 @@ void main()
 	}
 	else if (mode == 10.0f)
 	{
-		color = vec3(5.0f, 5.0f, 5.0f) + spec;
+		color = (vec3(1.0f, 1.0f, 1.0f) + spec) / 100.0f;
 	}
 
 	if (lightOn < 1.0f) {
@@ -52,6 +52,7 @@ void main()
 	float aa = 1.002 * exp(-pow((compFactor - 9.949) / 6.806, 2));
 	float ldrY = Y / (Y + compFactor);
 	vec3 ldr;
+	
 	ldr.x = pow(color.x / Y, 0.8) * ldrY;
 	ldr.y = pow(color.y / Y, 0.8) * ldrY;
 	ldr.z = pow(color.z / Y, 0.8) * ldrY;
@@ -59,4 +60,7 @@ void main()
 	outputColor.x = pow(ldr.x, 0.4) * 0.8;
 	outputColor.y = pow(ldr.y, 0.4) * 0.8;
 	outputColor.z = pow(ldr.z, 0.4) * 0.8;
+
+	//outputColor = color / (color + aa);
+	
 }	
