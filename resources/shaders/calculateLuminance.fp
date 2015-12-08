@@ -5,6 +5,7 @@ in vec4 xPosition;
 uniform sampler2D oldTexture;
 uniform sampler2D aimTexture;
 uniform float deltaTime;
+uniform float speed;
 out vec3 outputColor;
 
 void main()
@@ -17,14 +18,14 @@ void main()
 	float logOldLuminance = log(oldLuminance) / logE10;
 	float logAimLuminance = log(aimLuminance) / logE10;
 
-	float tauRod = 0.4;
+	float tauRod = 1.6;
 	float tauCone = 0.1;
 
 	float sigma = 0.04 / (0.04 + oldLuminance);
 	
 	float tau = sigma * tauRod + (1 - sigma) * tauCone;
 
-	float newLuminance = oldLuminance + (aimLuminance - oldLuminance) * (1 - exp(-(deltaTime/tau)));
+	float newLuminance = oldLuminance + (aimLuminance - oldLuminance) * speed;//(1 - exp(-(deltaTime/tau)));
 
 	//float newLuminance = pow(logNewLuminance, 10.0f);
 

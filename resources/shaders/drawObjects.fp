@@ -28,7 +28,7 @@ void main()
 	}
 	else if (mode == 10.0f)
 	{
-		outputColor = vec4(5.0f, 5.0f, 5.0f, 1.0f) + spec;
+		outputColor = (vec4(5.0f, 5.0f, 5.0f, 1.0f) + spec) / 1.0f;
 	}
 
 	if (lightOn < 1.0f) {

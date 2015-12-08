@@ -13,6 +13,7 @@ Game::Game(void)
 	defaultLightPower = 250.0f;
 	lightPower = defaultLightPower;
 	playerSpeed = 50.0f;
+	adaptationSpeed = 0.01f;
 	mouseSensitivity = 0.1f;
 	specularStrength = 1.0f;
 	setDeltaTime();
@@ -211,7 +212,7 @@ void Game::Redraw()
 	maskGenerator->GetParameter("y")->SetValue(1.0f - mousePosition.y / WINDOW_HEIGHT);
 	maskGenerator->GetParameter("width")->SetValue((float)WINDOW_WIDTH);
 	maskGenerator->GetParameter("height")->SetValue((float)WINDOW_HEIGHT);
-	maskGenerator->GetParameter("fov")->SetValue(2.0f);
+	maskGenerator->GetParameter("fov")->SetValue(1.0f);
 	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, maskGenerator->GetParameter("World"));
 	renderTarget2->createMipmaps();
 
@@ -240,6 +241,7 @@ void Game::Redraw()
 	
 	luminanceCalculator->GetParameter("aimTexture")->SetValue(*renderTarget3);
 	luminanceCalculator->GetParameter("deltaTime")->SetValue(deltaTime);
+	luminanceCalculator->GetParameter("speed")->SetValue(adaptationSpeed);
 	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, luminanceCalculator->GetParameter("World"));
 	renderTarget2->createMipmaps();
 	

@@ -34,6 +34,7 @@ private:
 	float specularStrength;
 	float lightPower;
 	float defaultLightPower;
+	float adaptationSpeed;
 
 	bool first;
 	bool lightOn;
