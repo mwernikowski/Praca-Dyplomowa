@@ -16,6 +16,7 @@ public:
 	void Draw(void);
 	void Draw(int, int, int, int, EffectParameter *world);
 	~Quad(void);
+	GLuint getVaoId() { return VertexVAOID[0]; }
 
 	void* operator new(size_t i)
 	{

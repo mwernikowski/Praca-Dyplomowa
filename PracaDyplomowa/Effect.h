@@ -37,5 +37,6 @@ public:
 	void glPrintError(GLenum err);
 	EffectParameter* operator[](GLchar *name);
 	EffectParameter* GetParameter(GLchar *name);
+	GLuint getProgramId();
 };
 

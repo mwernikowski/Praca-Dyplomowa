@@ -14,6 +14,11 @@ EffectParameter* Effect::GetParameter(GLchar *name)
 	return 0;
 }
 
+GLuint Effect::getProgramId()
+{
+	return ProgramId;
+}
+
 void EffectParameter::SetValue(RenderTarget2D rt)
 {
 	if (this == NULL)

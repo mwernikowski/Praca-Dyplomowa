@@ -5,10 +5,13 @@ private:
 	Quad* quad;
 	Texture2D* tex;
 
-	RenderTarget2D* renderTarget1;
-	RenderTarget2D* renderTarget2;
-	RenderTarget2D* renderTarget3;
+	RenderTarget2D* maskRT;
+	RenderTarget2D* sceneRT;
+	RenderTarget2D* luminanceMap;
 	RenderTarget2D* currentLuminance;
+	RenderTarget2D* adaptedRT;
+	RenderTarget2D* text;
+	RenderTarget2D* changedLuminance;
 
 	vector<Model*> sceneModels;
 	vector<Model*> lightSources;
@@ -22,6 +25,7 @@ private:
 	Effect* maskGenerator;
 	Effect* textureCopier;
 	Effect* maskMultiplier;
+	Effect* drawText;
 
 	Camera* camera;
 	Camera* light;
@@ -39,6 +43,9 @@ private:
 	bool first;
 	bool lightOn;
 
+	GAME_MODE gameMode;
+	FT_Face font;
+
 	void setDeltaTime();
 
 public:
@@ -47,9 +54,12 @@ public:
 	void Update();
 	void Init();
 	void Redraw();
+	void drawScene();
 	void Input();
 	void mouseMotion(double x, double y);
+	void mouseClick(int button, int action);
 	void drawSceneObjects(Effect* e);
 	void updateCameraAngles(float angleHorizontalDelta, float angleVerticalDelta);
+	void renderText(const std::string &str, float x, float y, float sx, float sy);
 };
 

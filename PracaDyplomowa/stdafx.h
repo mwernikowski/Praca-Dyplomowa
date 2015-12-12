@@ -25,6 +25,9 @@
 #include <fstream>
 #include <sstream>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #include "FreeImage.h"
 #include "assimp\Importer.hpp"
 #include "assimp\scene.h"
@@ -39,7 +42,10 @@ using namespace std;
 
 const int WINDOW_WIDTH = 1366;
 const int WINDOW_HEIGHT = 768;
-const bool FULLSCREEN = true;
+const bool FULLSCREEN = false;
+extern FT_Library freeType;
+
+enum GAME_MODE { FIRST_INTRODUCTION, FIRST_PRESENTATION, SECOND_INTRODUCTION, SECOND_PRESENTATION, SUMMARY };
 
 #include "Keyboard.h"
 #include "Texture2D.h"

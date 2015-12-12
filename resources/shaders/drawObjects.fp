@@ -14,9 +14,11 @@ out vec4 outputColor;
 
 void main()
 {
-	float NdL = dot(normalize(Normal), normalize(-xPosition.xyz + LightPosition));
+	float NdL = abs(dot(normalize(Normal), normalize(-xPosition.xyz + LightPosition)));
 	vec3 H = normalize(normalize(-xPosition.xyz + LightPosition));
 	float spec = clamp(pow(dot(normalize(Normal), H), 30.0f), 0.0, 1.0);
+	if (lightOn < 1.0f)
+		spec = 0.0f;
 
 	if (mode < 0.0f)
 	{
@@ -28,7 +30,7 @@ void main()
 	}
 	else if (mode == 10.0f)
 	{
-		outputColor = (vec4(5.0f, 5.0f, 5.0f, 1.0f) + spec) / 1.0f;
+		outputColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 	if (lightOn < 1.0f) {
@@ -36,20 +38,7 @@ void main()
 			outputColor = vec4(0,0,0,1);
 		else
 			outputColor *= 0.01f;
+			outputColor.r = outputColor.g;
+			outputColor.b = outputColor.g;
 	}
-
-	float visibility = 1.0f;
-	//if (texture2D(shadow, TexCoord).x < 1)
-	//	visibility = 0.2f;
-	vec3 luminanceConvert = vec3(0.212656, 0.715158, 0.072186);
-
-	float luminance = dot(outputColor.rgb, luminanceConvert);
-
-	outputColor.r = luminance / 3.0f;
-
-	luminance -= outputColor.r;
-
-	outputColor.g = luminance / 2.0f;
-
-	outputColor.b -= luminance - outputColor.g; 
 }

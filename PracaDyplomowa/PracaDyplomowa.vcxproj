@@ -196,6 +196,8 @@
     <None Include="..\resources\shaders\multiplyMask.vp" />
     <None Include="..\resources\shaders\calculateLuminance.fp" />
     <None Include="..\resources\shaders\calculateLuminance.vp" />
+    <None Include="..\resources\shaders\renderText.fp" />
+    <None Include="..\resources\shaders\renderText.vp" />
     <None Include="..\resources\shaders\shadow.fp" />
     <None Include="..\resources\shaders\shadow.vp" />
     <None Include="..\resources\shaders\drawSprite.fp" />
@@ -224,6 +226,8 @@
     <Import Project="..\packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets" Condition="Exists('..\packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets')" />
     <Import Project="..\packages\freeglut.redist.2.8.1.15\build\native\freeglut.redist.targets" Condition="Exists('..\packages\freeglut.redist.2.8.1.15\build\native\freeglut.redist.targets')" />
     <Import Project="..\packages\freeglut.2.8.1.15\build\native\freeglut.targets" Condition="Exists('..\packages\freeglut.2.8.1.15\build\native\freeglut.targets')" />
+    <Import Project="..\packages\freetype.redist.2.6.1.1\build\native\freetype.redist.targets" Condition="Exists('..\packages\freetype.redist.2.6.1.1\build\native\freetype.redist.targets')" />
+    <Import Project="..\packages\freetype.2.6.1.1\build\native\freetype.targets" Condition="Exists('..\packages\freetype.2.6.1.1\build\native\freetype.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -238,5 +242,7 @@
     <Error Condition="!Exists('..\packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets'))" />
     <Error Condition="!Exists('..\packages\freeglut.redist.2.8.1.15\build\native\freeglut.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freeglut.redist.2.8.1.15\build\native\freeglut.redist.targets'))" />
     <Error Condition="!Exists('..\packages\freeglut.2.8.1.15\build\native\freeglut.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freeglut.2.8.1.15\build\native\freeglut.targets'))" />
+    <Error Condition="!Exists('..\packages\freetype.redist.2.6.1.1\build\native\freetype.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freetype.redist.2.6.1.1\build\native\freetype.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\freetype.2.6.1.1\build\native\freetype.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freetype.2.6.1.1\build\native\freetype.targets'))" />
   </Target>
 </Project>

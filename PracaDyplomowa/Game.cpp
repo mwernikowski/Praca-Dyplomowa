@@ -13,10 +13,11 @@ Game::Game(void)
 	defaultLightPower = 250.0f;
 	lightPower = defaultLightPower;
 	playerSpeed = 50.0f;
-	adaptationSpeed = 0.01f;
+	adaptationSpeed = 0.1f;
 	mouseSensitivity = 0.1f;
 	specularStrength = 1.0f;
 	setDeltaTime();
+	gameMode = FIRST_PRESENTATION;
 	first = true;
 	lightOn = true;
 	mousePosition = glm::vec2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
@@ -28,11 +29,17 @@ Game::~Game(void)
 
 void Game::Init()
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	theta = 1.0f;
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
 	quad = new Quad();
+
+	if (FT_New_Face(freeType, "../resources/FreeSans.ttf", 0, &font)) {
+		fprintf(stderr, "ERROR: could not open font\n");
+		exit(EXIT_FAILURE);
+	}
+
+	FT_Set_Pixel_Sizes(font, 0, 48);
 
 	Model *model;
 	model = Content::LoadModel("../resources/Bedroom.obj");
@@ -85,10 +92,13 @@ void Game::Init()
 	model->setPosition(glm::vec3(1.7f, 10.7f, -4.4f));
 	lightSources.push_back(model);
 	
-	renderTarget1 = new RenderTarget2D();
-	renderTarget2 = new RenderTarget2D();
-	renderTarget3 = new RenderTarget2D();
+	sceneRT = new RenderTarget2D();
+	maskRT = new RenderTarget2D();
+	luminanceMap = new RenderTarget2D();
 	currentLuminance = new RenderTarget2D();
+	text = new RenderTarget2D();
+	adaptedRT = new RenderTarget2D();
+	changedLuminance = new RenderTarget2D();
 
 	objectsDrawer = new Effect("drawObjects");
 	objectsDrawer->CreateShader();
@@ -117,6 +127,9 @@ void Game::Init()
 	maskMultiplier = new Effect("multiplyMask");
 	maskMultiplier->CreateShader();
 
+	drawText = new Effect("renderText");
+	drawText->CreateShader();
+
 	camera = new Camera((float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
 	camera->setPosition(glm::vec3(10, 13, 3));
 	camera->setTarget(glm::vec3(0, 0, 0));
@@ -131,137 +144,162 @@ void Game::Init()
 
 void Game::Update()
 {
-	glm::vec3 newPosition = camera->getPosition();
-	glm::vec3 newTarget = camera->getTarget();
-	bool changed = false;
-	float horizontalAngle = camera->getHorizontalAngle();
-	float verticalAngle = camera->getVerticalAngle();
+	if (gameMode == FIRST_PRESENTATION || gameMode == SECOND_PRESENTATION)
+	{
+		glm::vec3 newPosition = camera->getPosition();
+		glm::vec3 newTarget = camera->getTarget();
+		bool changed = false;
+		float horizontalAngle = camera->getHorizontalAngle();
+		float verticalAngle = camera->getVerticalAngle();
 
-	if (Keyboard::isPressed('W'))
-	{
-		newPosition.z -= deltaTime * playerSpeed * (float)cos(horizontalAngle * M_PI / 180.0);
-		newPosition.x -= deltaTime * playerSpeed * (float)sin(horizontalAngle * M_PI / 180.0);
-		changed = true;
-	}
-	if (Keyboard::isPressed('S'))
-	{
-		newPosition.z += deltaTime * playerSpeed * (float)cos(horizontalAngle * M_PI / 180.0);
-		newPosition.x += deltaTime * playerSpeed * (float)sin(horizontalAngle * M_PI / 180.0);
-		changed = true;
-	}
-	if (Keyboard::isPressed('A'))
-	{
-		newPosition.z -= deltaTime * playerSpeed * (float)cos((horizontalAngle + 90.0) * M_PI / 180.0);
-		newPosition.x -= deltaTime * playerSpeed * (float)sin((horizontalAngle + 90.0) * M_PI / 180.0);
-		changed = true;
-	}
-	if (Keyboard::isPressed('D'))
-	{
-		newPosition.z += deltaTime * playerSpeed * (float)cos((camera->getHorizontalAngle() + 90.0) * M_PI / 180.0);
-		newPosition.x += deltaTime * playerSpeed * (float)sin((camera->getHorizontalAngle() + 90.0) * M_PI / 180.0);
-		changed = true;
-	}
-	if (Keyboard::isPressed(GLFW_KEY_UP))
-	{
-		updateCameraAngles(0.0, deltaTime * playerSpeed);
-		changed = true;
-	}
-	if (Keyboard::isPressed(GLFW_KEY_DOWN))
-	{
-		updateCameraAngles(0.0, -deltaTime * playerSpeed);
-		changed = true;
-	}
-	if (Keyboard::isPressed(GLFW_KEY_LEFT))
-	{
-		updateCameraAngles(deltaTime * playerSpeed, 0.0);
-		changed = true;
-	}
-	if (Keyboard::isPressed(GLFW_KEY_RIGHT))
-	{
-		updateCameraAngles(-deltaTime * playerSpeed, 0.0);
-		changed = true;
-	}
+		if (Keyboard::isPressed('W'))
+		{
+			newPosition.z -= deltaTime * playerSpeed * (float)cos(horizontalAngle * M_PI / 180.0);
+			newPosition.x -= deltaTime * playerSpeed * (float)sin(horizontalAngle * M_PI / 180.0);
+			changed = true;
+		}
+		if (Keyboard::isPressed('S'))
+		{
+			newPosition.z += deltaTime * playerSpeed * (float)cos(horizontalAngle * M_PI / 180.0);
+			newPosition.x += deltaTime * playerSpeed * (float)sin(horizontalAngle * M_PI / 180.0);
+			changed = true;
+		}
+		if (Keyboard::isPressed('A'))
+		{
+			newPosition.z -= deltaTime * playerSpeed * (float)cos((horizontalAngle + 90.0) * M_PI / 180.0);
+			newPosition.x -= deltaTime * playerSpeed * (float)sin((horizontalAngle + 90.0) * M_PI / 180.0);
+			changed = true;
+		}
+		if (Keyboard::isPressed('D'))
+		{
+			newPosition.z += deltaTime * playerSpeed * (float)cos((camera->getHorizontalAngle() + 90.0) * M_PI / 180.0);
+			newPosition.x += deltaTime * playerSpeed * (float)sin((camera->getHorizontalAngle() + 90.0) * M_PI / 180.0);
+			changed = true;
+		}
+		if (Keyboard::isPressed(GLFW_KEY_UP))
+		{
+			updateCameraAngles(0.0, deltaTime * playerSpeed);
+			changed = true;
+		}
+		if (Keyboard::isPressed(GLFW_KEY_DOWN))
+		{
+			updateCameraAngles(0.0, -deltaTime * playerSpeed);
+			changed = true;
+		}
+		if (Keyboard::isPressed(GLFW_KEY_LEFT))
+		{
+			updateCameraAngles(deltaTime * playerSpeed, 0.0);
+			changed = true;
+		}
+		if (Keyboard::isPressed(GLFW_KEY_RIGHT))
+		{
+			updateCameraAngles(-deltaTime * playerSpeed, 0.0);
+			changed = true;
+		}
 
-	if (Keyboard::isPressedAndReleased('F')) {
-		lightOn = !lightOn;
-	}
+		if (Keyboard::isPressedAndReleased('F')) {
+			lightOn = !lightOn;
+		}
 
 
-	if (changed == true)
-	{
-		camera->setPosition(newPosition);
-		newTarget.z = newPosition.z - (float)cos(verticalAngle * M_PI / 180.0) * (float)cos(horizontalAngle * M_PI / 180.0);
-		newTarget.y = newPosition.y + (float)sin(verticalAngle * M_PI / 180.0);
-		newTarget.x = newPosition.x - (float)cos(verticalAngle * M_PI / 180.0) * (float)sin(horizontalAngle * M_PI / 180.0);
-		camera->setTarget(newTarget);
+		if (changed == true)
+		{
+			camera->setPosition(newPosition);
+			newTarget.z = newPosition.z - (float)cos(verticalAngle * M_PI / 180.0) * (float)cos(horizontalAngle * M_PI / 180.0);
+			newTarget.y = newPosition.y + (float)sin(verticalAngle * M_PI / 180.0);
+			newTarget.x = newPosition.x - (float)cos(verticalAngle * M_PI / 180.0) * (float)sin(horizontalAngle * M_PI / 180.0);
+			camera->setTarget(newTarget);
+		}
 	}
 
 	if (Keyboard::isPressed(GLFW_KEY_ESCAPE))
 	{
 		glfwSetWindowShouldClose(glfwGetCurrentContext(), GL_TRUE);
 	}
+
 }
 
 void Game::Redraw()
 {
 	setDeltaTime();
+	switch (gameMode) {
+	case FIRST_INTRODUCTION:
+		break;
+	case SECOND_INTRODUCTION:
+		break;
+	case FIRST_PRESENTATION:
+		drawScene();
+		break;
+	case SECOND_PRESENTATION:
+		drawScene();
+		break;
+	case SUMMARY:
+		break;
+	}
+}
 
-	renderTarget2->SetRenderTarget();
+void Game::drawScene()
+{
+	maskRT->SetRenderTarget();
 	maskGenerator->Apply();
 	maskGenerator->GetParameter("x")->SetValue(mousePosition.x / WINDOW_WIDTH);
 	maskGenerator->GetParameter("y")->SetValue(1.0f - mousePosition.y / WINDOW_HEIGHT);
 	maskGenerator->GetParameter("width")->SetValue((float)WINDOW_WIDTH);
 	maskGenerator->GetParameter("height")->SetValue((float)WINDOW_HEIGHT);
-	maskGenerator->GetParameter("fov")->SetValue(1.0f);
+	maskGenerator->GetParameter("fov")->SetValue(90.0f);
+	maskGenerator->GetParameter("lightOn")->SetValue(lightOn ? 1.0f : 0.0f);
 	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, maskGenerator->GetParameter("World"));
-	renderTarget2->createMipmaps();
-
-	renderTarget1->SetRenderTarget();
+	maskRT->createMipmaps();
+	
+	sceneRT->SetRenderTarget();
 	objectsDrawer->Apply();
 	drawSceneObjects(objectsDrawer);
 
-	renderTarget3->SetRenderTarget();
+	luminanceMap->SetRenderTarget();
 	maskMultiplier->Apply();
-	maskMultiplier->GetParameter("tex")->SetValue(*renderTarget1);
-	maskMultiplier->GetParameter("mask")->SetValue(*renderTarget2);
+	maskMultiplier->GetParameter("tex")->SetValue(*sceneRT);
+	maskMultiplier->GetParameter("mask")->SetValue(*maskRT);
 	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, maskMultiplier->GetParameter("World"));
-	renderTarget3->createMipmaps();
-
-	renderTarget2->SetRenderTarget();
+	luminanceMap->createMipmaps();
+	
+	
+	changedLuminance->SetRenderTarget();
 	luminanceCalculator->Apply();
-	if (first) 
+	if (first)
 	{
 		first = false;
-		luminanceCalculator->GetParameter("oldTexture")->SetValue(*renderTarget3);
+		luminanceCalculator->GetParameter("oldTexture")->SetValue(*luminanceMap);
 	}
-	else 
+	else
 	{
 		luminanceCalculator->GetParameter("oldTexture")->SetValue(*currentLuminance);
 	}
-	
-	luminanceCalculator->GetParameter("aimTexture")->SetValue(*renderTarget3);
+
+	luminanceCalculator->GetParameter("aimTexture")->SetValue(*luminanceMap);
 	luminanceCalculator->GetParameter("deltaTime")->SetValue(deltaTime);
 	luminanceCalculator->GetParameter("speed")->SetValue(adaptationSpeed);
 	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, luminanceCalculator->GetParameter("World"));
-	renderTarget2->createMipmaps();
-	
+	changedLuminance->createMipmaps();
+
 	currentLuminance->SetRenderTarget();
 	textureCopier->Apply();
-	textureCopier->GetParameter("tex")->SetValue(*renderTarget2);
+	textureCopier->GetParameter("tex")->SetValue(*changedLuminance);
 	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, textureCopier->GetParameter("World"));
 	currentLuminance->createMipmaps();
 
-	renderTarget1->SetRenderTarget(WINDOW_WIDTH, WINDOW_HEIGHT);
+	adaptedRT->SetRenderTarget();
 	toneCompressor->Apply();
 	toneCompressor->GetParameter("x")->SetValue(mousePosition.x / WINDOW_WIDTH);
 	toneCompressor->GetParameter("y")->SetValue(1.0f - mousePosition.y / WINDOW_HEIGHT);
+	//toneCompressor->GetParameter("tex")->SetValue(*sceneRT);
 	toneCompressor->GetParameter("luminance")->SetValue(*currentLuminance);
+	//quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, toneCompressor->GetParameter("World"));
 	drawSceneObjects(toneCompressor);
-
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	spriteDrawer->Apply();
-	spriteDrawer->GetParameter("tex")->SetValue(*renderTarget1);
+	spriteDrawer->GetParameter("tex")->SetValue(*adaptedRT);
 	spriteDrawer->GetParameter("x")->SetValue(mousePosition.x / WINDOW_WIDTH);
 	spriteDrawer->GetParameter("y")->SetValue(1.0f - mousePosition.y / WINDOW_HEIGHT);
 	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, spriteDrawer->GetParameter("World"));
@@ -299,6 +337,13 @@ void Game::mouseMotion(double x, double y)
 	*/
 }
 
+void Game::mouseClick(int button, int action)
+{
+	if (button = GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+		lightOn = !lightOn;
+	}
+}
+
 void Game::updateCameraAngles(float angleHorizontalDelta, float angleVerticalDelta)
 {
 	float angleHorizontal = camera->getHorizontalAngle() + angleHorizontalDelta;
@@ -325,6 +370,46 @@ void Game::updateCameraAngles(float angleHorizontalDelta, float angleVerticalDel
 	newTarget.x = position.x - (float)cos(angleVertical * M_PI / 180.0) * (float)sin(angleHorizontal * M_PI / 180.0);
 	camera->setTarget(newTarget);
 }
+
+void Game::renderText(const std::string &str, float x, float y, float sx, float sy) {
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	const FT_GlyphSlot glyph = font->glyph;
+
+	for (auto c : str) {
+		if (FT_Load_Char(font, c, FT_LOAD_RENDER) != 0)
+			continue;
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8,
+			glyph->bitmap.width, glyph->bitmap.rows,
+			0, GL_RED, GL_UNSIGNED_BYTE, glyph->bitmap.buffer);
+
+		const float vx = x + glyph->bitmap_left * sx;
+		const float vy = y + glyph->bitmap_top * sy;
+		const float w = glyph->bitmap.width * sx;
+		const float h = glyph->bitmap.rows * sy;
+
+		struct {
+			float x, y, s, t;
+		} data[6] = {
+			{ vx    , vy    , 0, 0 },
+			{ vx    , vy - h, 0, 1 },
+			{ vx + w, vy    , 1, 0 },
+			{ vx + w, vy    , 1, 0 },
+			{ vx    , vy - h, 0, 1 },
+			{ vx + w, vy - h, 1, 1 }
+		};
+
+		glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), data, GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		x += (glyph->advance.x >> 6) * sx;
+		y += (glyph->advance.y >> 6) * sy;
+	}
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+}
+
 
 void Game::drawSceneObjects(Effect *g)
 {

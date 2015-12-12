@@ -1,11 +1,17 @@
 #include "stdafx.h"
 
 Game game;
+FT_Library freeType;
 
 void mouseMotionFunc(GLFWwindow* window, double x, double y)
 {
 	game.mouseMotion(x, y);	
 	//glfwSetCursorPos(window, WINDOW_WIDTH / 2.0, WINDOW_HEIGHT / 2.0);
+}
+
+void mouseButtonFunc(GLFWwindow* window, int button, int action, int mods)
+{
+	game.mouseClick(button, action);
 }
 
 int main()
@@ -17,7 +23,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_FALSE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	GLFWwindow* window;
 	if (FULLSCREEN)
@@ -38,6 +44,11 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 
+	if (FT_Init_FreeType(&freeType)) {
+		fprintf(stderr, "ERROR: could not initialize freetype library\n");
+		exit(EXIT_FAILURE);
+	}
+
 	// inicjalizacja GLEW
 	glewExperimental = GL_TRUE;
 	GLenum GlewInitResult;
@@ -47,9 +58,11 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 
+	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	// glowna petla gry
 	game.Init();
-	glfwSetCursorPosCallback(window, (GLFWcursorposfun)(mouseMotionFunc));
+	glfwSetCursorPosCallback(window, mouseMotionFunc);
+	glfwSetMouseButtonCallback(window, mouseButtonFunc);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	Keyboard::KeyboardInit();
 	glEnable(GL_DEPTH_TEST);

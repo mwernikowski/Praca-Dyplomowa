@@ -31,6 +31,7 @@ RenderTarget2D::RenderTarget2D(int Width, int Height, GLenum InternalFotrmat, GL
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBufferID);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTargetTextureID, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	//GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
 	//glDrawBuffers(1, DrawBuffers);
 }

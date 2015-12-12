@@ -221,6 +221,7 @@ void Effect::CreateShaderInfo()
 	ErrorCheckValue = glGetError();
 	if (ErrorCheckValue != GL_NO_ERROR)
 	{
+		char* infoLog;
 		fprintf(
 			stderr,
 			"ERROR: Could not create the shaders: %s \n",
