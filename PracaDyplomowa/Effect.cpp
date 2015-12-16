@@ -118,6 +118,29 @@ void Effect::CreateShader()
 	}
 }
 
+void Effect::CreateSimpleShader()
+{
+	GLenum ErrorCheckValue = glGetError();
+	const GLchar *v_str = VertexShader;
+	const GLchar *f_str = PixelShader;
+
+	VertexShaderId = glCreateShader(GL_VERTEX_SHADER);
+	FragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(VertexShaderId, 1, &v_str, NULL);
+	glShaderSource(FragmentShaderId, 1, &f_str, NULL);
+	glCompileShader(VertexShaderId);
+	glPrintError(glGetError());
+	glCompileShader(FragmentShaderId);
+	glPrintError(glGetError());
+	ProgramId = glCreateProgram();
+	glAttachShader(ProgramId, VertexShaderId);
+	glPrintError(glGetError());
+	glAttachShader(ProgramId, FragmentShaderId);
+	glPrintError(glGetError());
+
+	glLinkProgram(ProgramId);
+	glPrintError(glGetError());
+}
 
 void Effect::CreateShaderInfo()
 {

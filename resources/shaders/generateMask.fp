@@ -15,7 +15,7 @@ void main() {
 	m = m / fov;
 	m = 134.041 / (3.11 + m);
 	m = m / 43.1;
-	if (m < 0.5)
+	if (m < 0.6)
 		m = 0.0;
 
 	outputColor = vec4(m, 0, 0, 1);

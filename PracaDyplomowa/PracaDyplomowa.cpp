@@ -1,21 +1,22 @@
 #include "stdafx.h"
 
-Game game;
+Game *game;
 FT_Library freeType;
 
 void mouseMotionFunc(GLFWwindow* window, double x, double y)
 {
-	game.mouseMotion(x, y);	
+	game->mouseMotion(x, y);	
 	//glfwSetCursorPos(window, WINDOW_WIDTH / 2.0, WINDOW_HEIGHT / 2.0);
 }
 
 void mouseButtonFunc(GLFWwindow* window, int button, int action, int mods)
 {
-	game.mouseClick(button, action);
+	game->mouseClick(button, action);
 }
 
 int main()
 {
+	srand((unsigned)time(0));
 	if (!glfwInit()) {
 		return -1;
 	}
@@ -25,6 +26,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
+
 	GLFWwindow* window;
 	if (FULLSCREEN)
 		window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Praca dyplomowa", glfwGetPrimaryMonitor(), NULL);
@@ -44,11 +46,6 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 
-	if (FT_Init_FreeType(&freeType)) {
-		fprintf(stderr, "ERROR: could not initialize freetype library\n");
-		exit(EXIT_FAILURE);
-	}
-
 	// inicjalizacja GLEW
 	glewExperimental = GL_TRUE;
 	GLenum GlewInitResult;
@@ -60,18 +57,22 @@ int main()
 
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	// glowna petla gry
-	game.Init();
+	game = new Game();
+	game->Init();
 	glfwSetCursorPosCallback(window, mouseMotionFunc);
 	glfwSetMouseButtonCallback(window, mouseButtonFunc);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	Keyboard::KeyboardInit();
+
 	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	while (!glfwWindowShouldClose(window))
 	{
 		// rendering
-		game.Update();
-		game.Redraw();
+		game->Update();
+		game->Redraw();
 
 		glfwSwapBuffers(window);
 

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-RenderTarget2D::RenderTarget2D(void) : RenderTarget2D(WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, GL_DEPTH24_STENCIL8)
+RenderTarget2D::RenderTarget2D(void) : RenderTarget2D(WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA32F, GL_RGBA, GL_UNSIGNED_BYTE, GL_DEPTH24_STENCIL8)
 {
 }
 
@@ -128,7 +128,7 @@ void RenderTarget2D::copyToRenderTarget(RenderTarget2D * renderTarget, int width
 
 void RenderTarget2D::resize(int width, int height)
 {
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_DOUBLE, 0);
 }
 
 void RenderTarget2D::createMipmaps()

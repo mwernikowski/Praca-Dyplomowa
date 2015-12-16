@@ -16,7 +16,7 @@ void main()
 {
 	float NdL = abs(dot(normalize(Normal), normalize(-xPosition.xyz + LightPosition)));
 	vec3 H = normalize(normalize(-xPosition.xyz + LightPosition));
-	float spec = clamp(pow(dot(normalize(Normal), H), 30.0f), 0.0, 1.0);
+	float spec = clamp(pow(dot(normalize(Normal), H), 1.0f), 0.0, 0.2);
 	if (lightOn < 1.0f)
 		spec = 0.0f;
 
@@ -30,14 +30,14 @@ void main()
 	}
 	else if (mode == 10.0f)
 	{
-		outputColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		outputColor = vec4(5.0f, 5.0f, 5.0f, 1.0f);
 	}
 
 	if (lightOn < 1.0f) {
 		if (mode == 10.0f)
 			outputColor = vec4(0,0,0,1);
 		else
-			outputColor *= 0.01f;
+			outputColor *= 0.1f;
 			outputColor.r = outputColor.g;
 			outputColor.b = outputColor.g;
 	}

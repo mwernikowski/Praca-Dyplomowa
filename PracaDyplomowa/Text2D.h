@@ -2,14 +2,21 @@
 class Text2D
 {
 private:
-	Texture2D* fontTexture;
-	unsigned int vertexBuffer;
-	unsigned int uvBuffer;
-	unsigned int shader;
-	unsigned int uniformId;
+	GLuint texture, sampler;
+	GLuint vbo, vao;
+	GLuint vs, fs, program;
+	FT_Library library;
+	FT_Face face;
+	Effect* shader;
+
+	GLuint texUniform;
+	GLuint colorUniform;
+	void drawText(const string &text, float x, float y, float sx, float sy);
+	int getPolishSymbol(int character);
+
 public:
-	Text2D();
+	Text2D(string fontFile, string shaderName);
 	~Text2D();
-	void initText2D(const char* texturePath);
+	void renderText(const string &text, int x, int y, int size);
 };
 

@@ -170,6 +170,12 @@
     <None Include="..\resources\shaders\renderText.vp">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="..\resources\shaders\drawBar.fp">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\resources\shaders\drawBar.vp">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\packages\Assimp.3.0.0\build\native\lib\Win32\assimp.lib">

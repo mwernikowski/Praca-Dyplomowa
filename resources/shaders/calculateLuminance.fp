@@ -6,7 +6,7 @@ uniform sampler2D oldTexture;
 uniform sampler2D aimTexture;
 uniform float deltaTime;
 uniform float speed;
-out vec3 outputColor;
+out vec4 outputColor;
 
 void main()
 {
@@ -14,32 +14,44 @@ void main()
 	float oldLuminance = texture(oldTexture, TexCoord, 20).r / texture(oldTexture, TexCoord, 20).g;
 	float aimLuminance = texture(aimTexture, TexCoord, 20).r / texture(aimTexture, TexCoord, 20).g;
 
-	float tauRod = 1.6;
-	float tauCone = 1.6;
+	float tauRod = speed;
+	float tauCone = 0.2f;
 
-	float sigma = 0.04 / (0.04 + oldLuminance);
-	
-	float tau = sigma * tauRod + (1 - sigma) * tauCone;
-
-	float newLuminance = oldLuminance;// + (aimLuminance - oldLuminance) * speed;//(1 - exp(-(deltaTime/tau)));
+	float newLuminance = 0.0f;
 
 	float changeSign = 0.5f;
 	
-	if (oldLuminance > aimLuminance)
+	if (oldLuminance > aimLuminance) {
 		changeSign = -tauRod;
-	else if (oldLuminance < aimLuminance)
+	}
+	else if (oldLuminance < aimLuminance) {
 		changeSign = tauCone;
+	}
 
-	//newLuminance = oldLuminance + (deltaTime / changeSign);
+	/*if (abs(change) < 0.000001f)
+		newLuminance = oldLuminance;
+	else if (abs(change) < abs(aimLuminance - oldLuminance))
+		newLuminance = aimLuminance;
+	else*/
 
+	/*if (abs(change) < 0.006f)
+		newLuminance = oldLuminance;
+	else
+		newLuminance = oldLuminance + change;
+		*/
+	//newLuminance = oldLuminance + (aimLuminance - oldLuminance) * deltaTime / changeSign;
+
+	
+	if (abs(oldLuminance - aimLuminance) < 0.0005f)
+		newLuminance = aimLuminance;
+	else {
 
 	if (oldLuminance != aimLuminance)
 		newLuminance = oldLuminance + (deltaTime / changeSign);
 	else
 		newLuminance = aimLuminance;
-	
-	/*
-	if (oldLuminance > aimLuminance)
+	}
+	/*if (oldLuminance > aimLuminance)
 		if (oldLuminance < aimLuminance)
 			newLuminance = aimLuminance;
 	else if (oldLuminance < aimLuminance)
@@ -47,8 +59,7 @@ void main()
 			newLuminance = aimLuminance;
 	else
 		newLuminance = aimLuminance;
-	*/
-	//newLuminance = pow(10.0f, logNewLuminance);
-	//newLuminance = aimLuminance;
-	outputColor = vec3(newLuminance, 1, 0);
+		}*/
+
+	outputColor = vec4(newLuminance, 1, 0, 1);
 }

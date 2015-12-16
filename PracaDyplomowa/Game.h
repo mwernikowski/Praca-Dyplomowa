@@ -10,7 +10,6 @@ private:
 	RenderTarget2D* luminanceMap;
 	RenderTarget2D* currentLuminance;
 	RenderTarget2D* adaptedRT;
-	RenderTarget2D* text;
 	RenderTarget2D* changedLuminance;
 
 	vector<Model*> sceneModels;
@@ -25,7 +24,9 @@ private:
 	Effect* maskGenerator;
 	Effect* textureCopier;
 	Effect* maskMultiplier;
-	Effect* drawText;
+	Effect* barDrawer;
+
+	Text2D* text;
 
 	Camera* camera;
 	Camera* light;
@@ -40,11 +41,24 @@ private:
 	float defaultLightPower;
 	float adaptationSpeed;
 
+	float speeds[5];
+
+	int clickCounter;
+	float elapsedTime;
+	float boxPosition;
+
+	int sessionNumber;
+
 	bool first;
 	bool lightOn;
+	bool movingBar;
+
+	int firstSpeed, secondSpeed;
+	int repetition;
+
+	string input;
 
 	GAME_MODE gameMode;
-	FT_Face font;
 
 	void setDeltaTime();
 
@@ -55,11 +69,13 @@ public:
 	void Init();
 	void Redraw();
 	void drawScene();
+	void drawLogin();
+	void drawSecondIntroduction();
+	void drawSummary();
 	void Input();
 	void mouseMotion(double x, double y);
 	void mouseClick(int button, int action);
 	void drawSceneObjects(Effect* e);
 	void updateCameraAngles(float angleHorizontalDelta, float angleVerticalDelta);
-	void renderText(const std::string &str, float x, float y, float sx, float sy);
 };
 

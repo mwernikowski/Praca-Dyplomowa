@@ -1,7 +1,10 @@
-in vec2 texpos;
+#version 410 core
+precision highp float;
 uniform sampler2D tex;
 uniform vec4 color;
+in vec2 texCoords;
+out vec4 fragColor;
 
 void main(void) {
-  gl_FragColor = vec4(1, 1, 1, texture2D(tex, texpos).a) * color;
+    fragColor = vec4(1, 1, 1, texture(tex, texCoords).r) * color;
 }

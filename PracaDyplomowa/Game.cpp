@@ -17,10 +17,27 @@ Game::Game(void)
 	mouseSensitivity = 0.1f;
 	specularStrength = 1.0f;
 	setDeltaTime();
-	gameMode = FIRST_PRESENTATION;
+	gameMode = LOGIN;
 	first = true;
 	lightOn = true;
 	mousePosition = glm::vec2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+	input = "";
+	clickCounter = 0;
+	elapsedTime = 0.0f;
+	boxPosition = -1.0f;
+	movingBar = false;
+	speeds[0] = 0.2f;
+	speeds[1] = 0.4f;
+	speeds[2] = 0.8f;
+	speeds[3] = 1.6f;
+	speeds[4] = 3.2f;
+
+	repetition = 1;
+
+	firstSpeed = rand() % 5;
+	secondSpeed = rand() % 4;
+	if (secondSpeed >= firstSpeed)
+		++secondSpeed;
 }
 
 Game::~Game(void)
@@ -30,16 +47,9 @@ Game::~Game(void)
 void Game::Init()
 {
 	theta = 1.0f;
-	glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
 	quad = new Quad();
-
-	if (FT_New_Face(freeType, "../resources/FreeSans.ttf", 0, &font)) {
-		fprintf(stderr, "ERROR: could not open font\n");
-		exit(EXIT_FAILURE);
-	}
-
-	FT_Set_Pixel_Sizes(font, 0, 48);
 
 	Model *model;
 	model = Content::LoadModel("../resources/Bedroom.obj");
@@ -96,7 +106,6 @@ void Game::Init()
 	maskRT = new RenderTarget2D();
 	luminanceMap = new RenderTarget2D();
 	currentLuminance = new RenderTarget2D();
-	text = new RenderTarget2D();
 	adaptedRT = new RenderTarget2D();
 	changedLuminance = new RenderTarget2D();
 
@@ -127,8 +136,8 @@ void Game::Init()
 	maskMultiplier = new Effect("multiplyMask");
 	maskMultiplier->CreateShader();
 
-	drawText = new Effect("renderText");
-	drawText->CreateShader();
+	barDrawer = new Effect("drawBar");
+	barDrawer->CreateShader();
 
 	camera = new Camera((float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
 	camera->setPosition(glm::vec3(10, 13, 3));
@@ -140,6 +149,9 @@ void Game::Init()
 	light->SetFOV(35.0f);
 
 	LightPosition = glm::vec3(-5, 19, -6.7);
+
+	text = new Text2D("../resources/calibri.ttf", "renderText");
+
 }
 
 void Game::Update()
@@ -212,6 +224,56 @@ void Game::Update()
 		}
 	}
 
+	else if (gameMode == LOGIN) 
+	{
+		for (int i = 32; i <= 90; i++) {
+			if (Keyboard::isPressedAndReleased(i)) {
+				input += (char)i;
+			}
+		}
+		if (Keyboard::isPressedAndReleased(GLFW_KEY_BACKSPACE)) {
+			input = input.substr(0, input.size() - 1);
+		}
+
+		if (Keyboard::isPressed(GLFW_KEY_ENTER)) {
+			lightOn = true;
+			gameMode = FIRST_PRESENTATION;
+		}
+	}
+
+	else if (gameMode == FIRST_INTRODUCTION)
+	{
+		if (Keyboard::isPressed(GLFW_KEY_ENTER)) {
+			lightOn = true;
+			gameMode = FIRST_PRESENTATION;
+		}
+	}
+
+	else if (gameMode == SECOND_INTRODUCTION) {
+		if (Keyboard::isPressed(GLFW_KEY_ENTER)) {
+			lightOn = true;
+			gameMode = SECOND_PRESENTATION;
+		}
+	}
+
+	else if (gameMode == SUMMARY) {
+		if (Keyboard::isPressed(GLFW_KEY_SPACE)) {
+
+			fstream results;
+			results.open("results.csv", ios::app);
+			results << input << "," << repetition << ",to_dark,room" <<
+				"," << speeds[firstSpeed] << "," << speeds[secondSpeed] << "," << boxPosition << endl;
+			results.close();
+
+			repetition++;
+			firstSpeed = rand() % 5;
+			secondSpeed = rand() % 4;
+			if (secondSpeed >= firstSpeed)
+				++secondSpeed;
+			gameMode = FIRST_INTRODUCTION;
+		}
+	}
+
 	if (Keyboard::isPressed(GLFW_KEY_ESCAPE))
 	{
 		glfwSetWindowShouldClose(glfwGetCurrentContext(), GL_TRUE);
@@ -223,9 +285,14 @@ void Game::Redraw()
 {
 	setDeltaTime();
 	switch (gameMode) {
+	case LOGIN:
+		drawLogin();
+		break;
 	case FIRST_INTRODUCTION:
+		drawLogin();
 		break;
 	case SECOND_INTRODUCTION:
+		drawSecondIntroduction();
 		break;
 	case FIRST_PRESENTATION:
 		drawScene();
@@ -234,12 +301,73 @@ void Game::Redraw()
 		drawScene();
 		break;
 	case SUMMARY:
+		drawSummary();
 		break;
 	}
 }
 
+void Game::drawLogin()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	text->renderText("Za chwile na ekranie wyswietli sie scena w oswietlonym pokoju. ", 10, 100, 30);
+	text->renderText("Ruch ludzkiego oka bedzie symulowany za pomoca ruchu myszki. ", 10, 150, 30);
+	text->renderText("Po nacisnieciu lewego przycisku myszy zgasnie swiatlo i rozpocznie sie proces", 10, 200, 30);
+	text->renderText("adaptacji do ciemnosci.", 10, 230, 30);
+	text->renderText("Po ponownym nacisnieciu przycisku swiatlo wlaczy sie i rozpocznie sie proces", 10, 280, 30);
+	text->renderText("adaptacji do jasnosci.", 10, 310, 30);
+	text->renderText("Symulacja zakonczy sie 5 sekund po drugim nacisnieciu przycisku.", 10, 360, 30);
+	if (gameMode == LOGIN) {
+		text->renderText("Podaj swoje imie i nacisnij ENTER:", 100, 500, 50);
+		text->renderText(input, 100, 570, 50);
+	}
+	else 
+		text->renderText("Nacisnij ENTER, aby kontynuowac", 100, 500, 50);
+}
+
+void Game::drawSecondIntroduction()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	text->renderText("Za chwile na ekranie wyswietli sie scena w oswietlonym pokoju. ", 10, 100, 30);
+	text->renderText("Ruch ludzkiego oka bedzie symulowany za pomoca ruchu myszki. ", 10, 150, 30);
+	text->renderText("Po nacisnieciu lewego przycisku myszy zgasnie swiatlo i rozpocznie sie proces", 10, 200, 30);
+	text->renderText("adaptacji do ciemnosci.", 10, 230, 30);
+	text->renderText("Po ponownym nacisnieciu przycisku swiatlo wlaczy sie i rozpocznie sie proces", 10, 280, 30);
+	text->renderText("adaptacji do jasnosci.", 10, 310, 30);
+	text->renderText("Symulacja zakonczy sie 5 sekund po drugim nacisnieciu przycisku.", 10, 360, 30);
+	text->renderText("Adaptacja bedzie przebiegac z inna predkoscia.", 10, 500, 50);
+	text->renderText("Nacisnij ENTER, aby kontynuowac.", 10, 570, 50);
+}
+
+void Game::drawSummary()
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	barDrawer->Apply();
+	barDrawer->GetParameter("x")->SetValue(mousePosition.x / WINDOW_WIDTH);
+	barDrawer->GetParameter("y")->SetValue(1.0f - mousePosition.y / WINDOW_HEIGHT);
+	barDrawer->GetParameter("boxPosition")->SetValue(boxPosition);
+	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, barDrawer->GetParameter("World"));
+
+	
+	text->renderText("Ktory sposob adaptacji bardziej Ci odpowiadal?", 50, 300, 50);
+	text->renderText("Zdecydowanie pierwszy", 2, WINDOW_HEIGHT * 0.58, 18);
+	text->renderText("Raczej pierwszy", 0.225 * WINDOW_WIDTH, 0.83 * WINDOW_HEIGHT, 18);
+	text->renderText("Nie widze roznicy", 0.45 * WINDOW_WIDTH, 0.58 * WINDOW_HEIGHT, 18);
+	text->renderText("Raczej drugi", 0.675 * WINDOW_WIDTH, 0.83 * WINDOW_HEIGHT, 18);
+	text->renderText("Zdecydowanie drugi", 0.85 * WINDOW_WIDTH, 0.58 * WINDOW_HEIGHT, 18);
+
+	text->renderText("Nacisnij SPACJE, aby zatwierdzic wybor i rozpoczac nowa sesje.", 10, WINDOW_HEIGHT * 0.95, 50);
+}
+
 void Game::drawScene()
 {
+	if (clickCounter > 1) {
+		elapsedTime += deltaTime;
+		if (elapsedTime > 5.0f) {
+			gameMode = (gameMode == FIRST_PRESENTATION ? SECOND_INTRODUCTION : SUMMARY);
+			elapsedTime = 0.0f;
+			clickCounter = 0;
+		}
+	}
 	maskRT->SetRenderTarget();
 	maskGenerator->Apply();
 	maskGenerator->GetParameter("x")->SetValue(mousePosition.x / WINDOW_WIDTH);
@@ -277,7 +405,7 @@ void Game::drawScene()
 
 	luminanceCalculator->GetParameter("aimTexture")->SetValue(*luminanceMap);
 	luminanceCalculator->GetParameter("deltaTime")->SetValue(deltaTime);
-	luminanceCalculator->GetParameter("speed")->SetValue(adaptationSpeed);
+	luminanceCalculator->GetParameter("speed")->SetValue(speeds[(gameMode == FIRST_PRESENTATION ? firstSpeed : secondSpeed)]);
 	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, luminanceCalculator->GetParameter("World"));
 	changedLuminance->createMipmaps();
 
@@ -291,9 +419,7 @@ void Game::drawScene()
 	toneCompressor->Apply();
 	toneCompressor->GetParameter("x")->SetValue(mousePosition.x / WINDOW_WIDTH);
 	toneCompressor->GetParameter("y")->SetValue(1.0f - mousePosition.y / WINDOW_HEIGHT);
-	//toneCompressor->GetParameter("tex")->SetValue(*sceneRT);
 	toneCompressor->GetParameter("luminance")->SetValue(*currentLuminance);
-	//quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, toneCompressor->GetParameter("World"));
 	drawSceneObjects(toneCompressor);
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -308,6 +434,21 @@ void Game::drawScene()
 void Game::mouseMotion(double x, double y)
 {
 	mousePosition = glm::vec2(x, y);
+
+	if (gameMode == SUMMARY && movingBar) {
+
+		float normalBoxPosition = (boxPosition + 1.0f) * 0.5f * 0.9f + 0.05f;
+		float normalY = 1.0f - mousePosition.y / WINDOW_HEIGHT;
+		float normalX = mousePosition.x / WINDOW_WIDTH;
+
+		if (normalX >= 0.05f && normalX <= 0.95f)
+			boxPosition = (((normalX - 0.05f) / 0.9f) / 0.5f) - 1.0f;
+		else if (normalX < 0.05f)
+			boxPosition = -1.0f;
+		else
+			boxPosition = 1.0f;
+	}
+
 	/*float angleHorizontal = camera->getHorizontalAngle();
 	float angleVertical = camera->getVerticalAngle();
 
@@ -339,8 +480,24 @@ void Game::mouseMotion(double x, double y)
 
 void Game::mouseClick(int button, int action)
 {
-	if (button = GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+	if (button = GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS && (gameMode == FIRST_PRESENTATION || gameMode == SECOND_PRESENTATION)) {
 		lightOn = !lightOn;
+		clickCounter++;
+		if (clickCounter == 2) {
+			elapsedTime = 0.0f;
+		}
+	}
+
+	if (button = GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS && gameMode == SUMMARY) {
+		float normalBoxPosition = (boxPosition + 1.0f) * 0.5f * 0.9f + 0.05f;
+		float normalY = 1.0f - mousePosition.y / WINDOW_HEIGHT;
+		float normalX = mousePosition.x / WINDOW_WIDTH;
+
+		if (abs(normalY - 0.3f) < 0.1f && abs(normalX - normalBoxPosition) < 0.01f)
+			movingBar = true;
+	}
+	if (button = GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE && gameMode == SUMMARY) {
+		movingBar = false;
 	}
 }
 
@@ -370,46 +527,6 @@ void Game::updateCameraAngles(float angleHorizontalDelta, float angleVerticalDel
 	newTarget.x = position.x - (float)cos(angleVertical * M_PI / 180.0) * (float)sin(angleHorizontal * M_PI / 180.0);
 	camera->setTarget(newTarget);
 }
-
-void Game::renderText(const std::string &str, float x, float y, float sx, float sy) {
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	const FT_GlyphSlot glyph = font->glyph;
-
-	for (auto c : str) {
-		if (FT_Load_Char(font, c, FT_LOAD_RENDER) != 0)
-			continue;
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8,
-			glyph->bitmap.width, glyph->bitmap.rows,
-			0, GL_RED, GL_UNSIGNED_BYTE, glyph->bitmap.buffer);
-
-		const float vx = x + glyph->bitmap_left * sx;
-		const float vy = y + glyph->bitmap_top * sy;
-		const float w = glyph->bitmap.width * sx;
-		const float h = glyph->bitmap.rows * sy;
-
-		struct {
-			float x, y, s, t;
-		} data[6] = {
-			{ vx    , vy    , 0, 0 },
-			{ vx    , vy - h, 0, 1 },
-			{ vx + w, vy    , 1, 0 },
-			{ vx + w, vy    , 1, 0 },
-			{ vx    , vy - h, 0, 1 },
-			{ vx + w, vy - h, 1, 1 }
-		};
-
-		glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), data, GL_DYNAMIC_DRAW);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
-		x += (glyph->advance.x >> 6) * sx;
-		y += (glyph->advance.y >> 6) * sy;
-	}
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-}
-
 
 void Game::drawSceneObjects(Effect *g)
 {

@@ -24,6 +24,7 @@ public:
 	Effect(string ShaderName);
 	~Effect(void);
 	void CreateShader();
+	void CreateSimpleShader();
 	void CreateShaderInfo();
 	void destroyShader();
 	void Apply();

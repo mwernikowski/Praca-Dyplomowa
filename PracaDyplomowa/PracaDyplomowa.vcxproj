@@ -190,6 +190,8 @@
     <None Include="..\resources\shaders\compressTones.vp" />
     <None Include="..\resources\shaders\copyTexture.fp" />
     <None Include="..\resources\shaders\copyTexture.vp" />
+    <None Include="..\resources\shaders\drawBar.fp" />
+    <None Include="..\resources\shaders\drawBar.vp" />
     <None Include="..\resources\shaders\generateMask.fp" />
     <None Include="..\resources\shaders\generateMask.vp" />
     <None Include="..\resources\shaders\multiplyMask.fp" />
