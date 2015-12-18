@@ -8,8 +8,10 @@ void Game::setDeltaTime()
 	oldTime = time;
 }
 
-Game::Game(void)
+Game::Game(string input, int sessions)
 {
+	this->input = input;
+	this->sessionsLeft = sessions;
 	defaultLightPower = 250.0f;
 	lightPower = defaultLightPower;
 	playerSpeed = 50.0f;
@@ -17,7 +19,7 @@ Game::Game(void)
 	mouseSensitivity = 0.1f;
 	specularStrength = 1.0f;
 	setDeltaTime();
-	gameMode = LOGIN;
+	gameMode = FIRST_INTRODUCTION;
 	first = true;
 	lightOn = true;
 	mousePosition = glm::vec2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
@@ -127,9 +129,6 @@ void Game::Init()
 	shadowEffect = new Effect("shadow");
 	shadowEffect->CreateShader();
 
-	maskGenerator = new Effect("generateMask");
-	maskGenerator->CreateShader();
-
 	textureCopier = new Effect("copyTexture");
 	textureCopier->CreateShader();
 	
@@ -209,10 +208,6 @@ void Game::Update()
 			changed = true;
 		}
 
-		if (Keyboard::isPressedAndReleased('F')) {
-			lightOn = !lightOn;
-		}
-
 
 		if (changed == true)
 		{
@@ -221,23 +216,6 @@ void Game::Update()
 			newTarget.y = newPosition.y + (float)sin(verticalAngle * M_PI / 180.0);
 			newTarget.x = newPosition.x - (float)cos(verticalAngle * M_PI / 180.0) * (float)sin(horizontalAngle * M_PI / 180.0);
 			camera->setTarget(newTarget);
-		}
-	}
-
-	else if (gameMode == LOGIN) 
-	{
-		for (int i = 32; i <= 90; i++) {
-			if (Keyboard::isPressedAndReleased(i)) {
-				input += (char)i;
-			}
-		}
-		if (Keyboard::isPressedAndReleased(GLFW_KEY_BACKSPACE)) {
-			input = input.substr(0, input.size() - 1);
-		}
-
-		if (Keyboard::isPressed(GLFW_KEY_ENTER)) {
-			lightOn = true;
-			gameMode = FIRST_PRESENTATION;
 		}
 	}
 
@@ -264,6 +242,7 @@ void Game::Update()
 			results << input << "," << repetition << ",to_dark,room" <<
 				"," << speeds[firstSpeed] << "," << speeds[secondSpeed] << "," << boxPosition << endl;
 			results.close();
+			sessionsLeft--;
 
 			repetition++;
 			firstSpeed = rand() % 5;
@@ -271,6 +250,8 @@ void Game::Update()
 			if (secondSpeed >= firstSpeed)
 				++secondSpeed;
 			gameMode = FIRST_INTRODUCTION;
+			if (sessionsLeft == 0)
+				glfwSetWindowShouldClose(glfwGetCurrentContext(), GL_TRUE);
 		}
 	}
 
@@ -285,9 +266,6 @@ void Game::Redraw()
 {
 	setDeltaTime();
 	switch (gameMode) {
-	case LOGIN:
-		drawLogin();
-		break;
 	case FIRST_INTRODUCTION:
 		drawLogin();
 		break;
@@ -313,15 +291,8 @@ void Game::drawLogin()
 	text->renderText("Ruch ludzkiego oka bedzie symulowany za pomoca ruchu myszki. ", 10, 150, 30);
 	text->renderText("Po nacisnieciu lewego przycisku myszy zgasnie swiatlo i rozpocznie sie proces", 10, 200, 30);
 	text->renderText("adaptacji do ciemnosci.", 10, 230, 30);
-	text->renderText("Po ponownym nacisnieciu przycisku swiatlo wlaczy sie i rozpocznie sie proces", 10, 280, 30);
-	text->renderText("adaptacji do jasnosci.", 10, 310, 30);
-	text->renderText("Symulacja zakonczy sie 5 sekund po drugim nacisnieciu przycisku.", 10, 360, 30);
-	if (gameMode == LOGIN) {
-		text->renderText("Podaj swoje imie i nacisnij ENTER:", 100, 500, 50);
-		text->renderText(input, 100, 570, 50);
-	}
-	else 
-		text->renderText("Nacisnij ENTER, aby kontynuowac", 100, 500, 50);
+	text->renderText("Symulacja zakonczy sie 10 sekund po drugim nacisnieciu przycisku.", 10, 280, 30);
+	text->renderText("Nacisnij ENTER, aby kontynuowac", 100, 500, 50);
 }
 
 void Game::drawSecondIntroduction()
@@ -331,9 +302,7 @@ void Game::drawSecondIntroduction()
 	text->renderText("Ruch ludzkiego oka bedzie symulowany za pomoca ruchu myszki. ", 10, 150, 30);
 	text->renderText("Po nacisnieciu lewego przycisku myszy zgasnie swiatlo i rozpocznie sie proces", 10, 200, 30);
 	text->renderText("adaptacji do ciemnosci.", 10, 230, 30);
-	text->renderText("Po ponownym nacisnieciu przycisku swiatlo wlaczy sie i rozpocznie sie proces", 10, 280, 30);
-	text->renderText("adaptacji do jasnosci.", 10, 310, 30);
-	text->renderText("Symulacja zakonczy sie 5 sekund po drugim nacisnieciu przycisku.", 10, 360, 30);
+	text->renderText("Symulacja zakonczy sie 10 sekund pozniej.", 10, 280, 30);
 	text->renderText("Adaptacja bedzie przebiegac z inna predkoscia.", 10, 500, 50);
 	text->renderText("Nacisnij ENTER, aby kontynuowac.", 10, 570, 50);
 }
@@ -349,35 +318,28 @@ void Game::drawSummary()
 
 	
 	text->renderText("Ktory sposob adaptacji bardziej Ci odpowiadal?", 50, 300, 50);
-	text->renderText("Zdecydowanie pierwszy", 2, WINDOW_HEIGHT * 0.58, 18);
-	text->renderText("Raczej pierwszy", 0.225 * WINDOW_WIDTH, 0.83 * WINDOW_HEIGHT, 18);
-	text->renderText("Nie widze roznicy", 0.45 * WINDOW_WIDTH, 0.58 * WINDOW_HEIGHT, 18);
-	text->renderText("Raczej drugi", 0.675 * WINDOW_WIDTH, 0.83 * WINDOW_HEIGHT, 18);
-	text->renderText("Zdecydowanie drugi", 0.85 * WINDOW_WIDTH, 0.58 * WINDOW_HEIGHT, 18);
-
-	text->renderText("Nacisnij SPACJE, aby zatwierdzic wybor i rozpoczac nowa sesje.", 10, WINDOW_HEIGHT * 0.95, 50);
+	text->renderText("Zdecydowanie pierwszy", 2, (int)(WINDOW_HEIGHT * 0.58), 18);
+	text->renderText("Raczej pierwszy", (int)(0.225 * WINDOW_WIDTH), (int)(0.83 * WINDOW_HEIGHT), 18);
+	text->renderText("Nie widze roznicy", (int)(0.45 * WINDOW_WIDTH), (int)(0.58 * WINDOW_HEIGHT), 18);
+	text->renderText("Raczej drugi", (int)(0.675 * WINDOW_WIDTH), (int)(0.83 * WINDOW_HEIGHT), 18);
+	text->renderText("Zdecydowanie drugi", (int)(0.85 * WINDOW_WIDTH), (int)(0.58 * WINDOW_HEIGHT), 18);
+	if (sessionsLeft > 1)
+		text->renderText("Nacisnij SPACJE, aby zatwierdzic wybor i rozpoczac nowa sesje.", 10, (int)(WINDOW_HEIGHT * 0.95), 50);
+	else
+		text->renderText("Nacisnij SPACJE, aby zakonczyc eksperyment.", 10, (int)(WINDOW_HEIGHT * 0.95), 50);
 }
 
 void Game::drawScene()
 {
-	if (clickCounter > 1) {
+	if (clickCounter > 0) {
 		elapsedTime += deltaTime;
-		if (elapsedTime > 5.0f) {
+		if (elapsedTime > 10.0f) {
 			gameMode = (gameMode == FIRST_PRESENTATION ? SECOND_INTRODUCTION : SUMMARY);
 			elapsedTime = 0.0f;
 			clickCounter = 0;
+			boxPosition = 0.0f;
 		}
 	}
-	maskRT->SetRenderTarget();
-	maskGenerator->Apply();
-	maskGenerator->GetParameter("x")->SetValue(mousePosition.x / WINDOW_WIDTH);
-	maskGenerator->GetParameter("y")->SetValue(1.0f - mousePosition.y / WINDOW_HEIGHT);
-	maskGenerator->GetParameter("width")->SetValue((float)WINDOW_WIDTH);
-	maskGenerator->GetParameter("height")->SetValue((float)WINDOW_HEIGHT);
-	maskGenerator->GetParameter("fov")->SetValue(90.0f);
-	maskGenerator->GetParameter("lightOn")->SetValue(lightOn ? 1.0f : 0.0f);
-	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, maskGenerator->GetParameter("World"));
-	maskRT->createMipmaps();
 	
 	sceneRT->SetRenderTarget();
 	objectsDrawer->Apply();
@@ -386,7 +348,11 @@ void Game::drawScene()
 	luminanceMap->SetRenderTarget();
 	maskMultiplier->Apply();
 	maskMultiplier->GetParameter("tex")->SetValue(*sceneRT);
-	maskMultiplier->GetParameter("mask")->SetValue(*maskRT);
+	maskMultiplier->GetParameter("x")->SetValue(mousePosition.x / WINDOW_WIDTH);
+	maskMultiplier->GetParameter("y")->SetValue(1.0f - mousePosition.y / WINDOW_HEIGHT);
+	maskMultiplier->GetParameter("width")->SetValue((float)WINDOW_WIDTH);
+	maskMultiplier->GetParameter("height")->SetValue((float)WINDOW_HEIGHT);
+	maskMultiplier->GetParameter("fov")->SetValue(90.0f);
 	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, maskMultiplier->GetParameter("World"));
 	luminanceMap->createMipmaps();
 	
@@ -407,7 +373,6 @@ void Game::drawScene()
 	luminanceCalculator->GetParameter("deltaTime")->SetValue(deltaTime);
 	luminanceCalculator->GetParameter("speed")->SetValue(speeds[(gameMode == FIRST_PRESENTATION ? firstSpeed : secondSpeed)]);
 	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, luminanceCalculator->GetParameter("World"));
-	changedLuminance->createMipmaps();
 
 	currentLuminance->SetRenderTarget();
 	textureCopier->Apply();
@@ -483,7 +448,7 @@ void Game::mouseClick(int button, int action)
 	if (button = GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS && (gameMode == FIRST_PRESENTATION || gameMode == SECOND_PRESENTATION)) {
 		lightOn = !lightOn;
 		clickCounter++;
-		if (clickCounter == 2) {
+		if (clickCounter == 1) {
 			elapsedTime = 0.0f;
 		}
 	}

@@ -123,7 +123,7 @@ void RenderTarget2D::SetRenderTarget(int width, int height)
 void RenderTarget2D::copyToRenderTarget(RenderTarget2D * renderTarget, int width, int height, int level)
 {
 	renderTarget->Bind();
-	glCopyTexImage2D(GL_TEXTURE_2D, level, GL_RGBA, 0, 0, width, height, 0);
+	glCopyTexImage2D(GL_TEXTURE_2D, level, GL_RGBA32F, 0, 0, width, height, 0);
 }
 
 void RenderTarget2D::resize(int width, int height)

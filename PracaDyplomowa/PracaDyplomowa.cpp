@@ -14,7 +14,7 @@ void mouseButtonFunc(GLFWwindow* window, int button, int action, int mods)
 	game->mouseClick(button, action);
 }
 
-int main()
+int main(int argc, char** argv)
 {
 	srand((unsigned)time(0));
 	if (!glfwInit()) {
@@ -38,6 +38,16 @@ int main()
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
+	string name;
+	int iters;
+	if (argc == 3) {
+		name = argv[1];
+		iters = stoi(argv[2]);
+	}
+	else {
+		name = "TEST";
+		iters = 1;
+	}
 
 	// sprawdzenie czy nie wystapil blad
 	GLenum err = glGetError();
@@ -57,7 +67,7 @@ int main()
 
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	// glowna petla gry
-	game = new Game();
+	game = new Game(name, iters);
 	game->Init();
 	glfwSetCursorPosCallback(window, mouseMotionFunc);
 	glfwSetMouseButtonCallback(window, mouseButtonFunc);

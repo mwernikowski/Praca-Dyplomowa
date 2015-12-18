@@ -42,7 +42,7 @@ void main()
 	//newLuminance = oldLuminance + (aimLuminance - oldLuminance) * deltaTime / changeSign;
 
 	
-	if (abs(oldLuminance - aimLuminance) < 0.0005f)
+	if (abs(oldLuminance - aimLuminance) < 0.001f)
 		newLuminance = aimLuminance;
 	else {
 

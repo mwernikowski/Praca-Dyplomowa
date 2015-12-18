@@ -21,7 +21,6 @@ private:
 	Effect* toneCompressor;
 	Effect* luminanceCalculator;
 	Effect* shadowEffect;
-	Effect* maskGenerator;
 	Effect* textureCopier;
 	Effect* maskMultiplier;
 	Effect* barDrawer;
@@ -47,7 +46,7 @@ private:
 	float elapsedTime;
 	float boxPosition;
 
-	int sessionNumber;
+	int sessionsLeft;
 
 	bool first;
 	bool lightOn;
@@ -63,7 +62,7 @@ private:
 	void setDeltaTime();
 
 public:
-	Game(void);
+	Game(string input, int sessions);
 	~Game(void);
 	void Update();
 	void Init();

@@ -192,8 +192,6 @@
     <None Include="..\resources\shaders\copyTexture.vp" />
     <None Include="..\resources\shaders\drawBar.fp" />
     <None Include="..\resources\shaders\drawBar.vp" />
-    <None Include="..\resources\shaders\generateMask.fp" />
-    <None Include="..\resources\shaders\generateMask.vp" />
     <None Include="..\resources\shaders\multiplyMask.fp" />
     <None Include="..\resources\shaders\multiplyMask.vp" />
     <None Include="..\resources\shaders\calculateLuminance.fp" />
@@ -213,6 +211,7 @@
   <ItemGroup>
     <Library Include="..\packages\Assimp.3.0.0\build\native\lib\Win32\assimp.lib" />
     <Library Include="..\packages\freeimage.3.16.0\build\native\lib\Win32\dynamic\FreeImage.lib" />
+    <Library Include="..\packages\freeimage.3.16.0\build\native\lib\x64\dynamic\FreeImage.lib" />
     <Library Include="..\packages\nupengl.core.0.1.0.1\build\native\lib\Win32\freeglut.lib" />
     <Library Include="..\packages\nupengl.core.0.1.0.1\build\native\lib\Win32\glew32.lib" />
     <Library Include="..\packages\nupengl.core.0.1.0.1\build\native\lib\Win32\glfw3dll.lib" />

@@ -134,12 +134,6 @@
     <None Include="..\resources\shaders\drawObjects.vp">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="..\resources\shaders\generateMask.fp">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="..\resources\shaders\generateMask.vp">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="..\resources\shaders\multiplyMask.fp">
       <Filter>Source Files\Shaders</Filter>
     </None>
@@ -191,6 +185,9 @@
       <Filter>Resource Files</Filter>
     </Library>
     <Library Include="..\packages\nupengl.core.0.1.0.1\build\native\lib\Win32\glfw3dll.lib">
+      <Filter>Resource Files</Filter>
+    </Library>
+    <Library Include="..\packages\freeimage.3.16.0\build\native\lib\x64\dynamic\FreeImage.lib">
       <Filter>Resource Files</Filter>
     </Library>
   </ItemGroup>
