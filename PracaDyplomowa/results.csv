@@ -1,0 +1,4 @@
+observer,repetition,condition_id,scene,param1,param2,score
+TEST,1,to_dark,room,3.2,0.2,-0.143159
+TEST,1,to_dark,room,1.6,0.4,0.102489
+TEST,1,to_dark,room,0.2,3.2,0
