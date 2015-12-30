@@ -42,7 +42,7 @@ using namespace std;
 
 const int WINDOW_WIDTH = 1366;
 const int WINDOW_HEIGHT = 768;
-const bool FULLSCREEN = false;
+const bool FULLSCREEN = true;
 
 enum GAME_MODE { FIRST_INTRODUCTION, FIRST_PRESENTATION, SECOND_INTRODUCTION, SECOND_PRESENTATION, SUMMARY };
 

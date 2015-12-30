@@ -109,7 +109,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="..\resources\shaders\tmo.fp">
       <Filter>Source Files\Shaders</Filter>
     </None>
@@ -170,28 +169,6 @@
     <None Include="..\resources\shaders\drawBar.vp">
       <Filter>Source Files\Shaders</Filter>
     </None>
-    <None Include="..\Debug\start.exe">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\packages\Assimp.3.0.0\build\native\lib\Win32\assimp.lib">
-      <Filter>Resource Files</Filter>
-    </Library>
-    <Library Include="..\packages\freeimage.3.16.0\build\native\lib\Win32\dynamic\FreeImage.lib">
-      <Filter>Resource Files</Filter>
-    </Library>
-    <Library Include="..\packages\nupengl.core.0.1.0.1\build\native\lib\Win32\freeglut.lib">
-      <Filter>Resource Files</Filter>
-    </Library>
-    <Library Include="..\packages\nupengl.core.0.1.0.1\build\native\lib\Win32\glew32.lib">
-      <Filter>Resource Files</Filter>
-    </Library>
-    <Library Include="..\packages\nupengl.core.0.1.0.1\build\native\lib\Win32\glfw3dll.lib">
-      <Filter>Resource Files</Filter>
-    </Library>
-    <Library Include="..\packages\freeimage.3.16.0\build\native\lib\x64\dynamic\FreeImage.lib">
-      <Filter>Resource Files</Filter>
-    </Library>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

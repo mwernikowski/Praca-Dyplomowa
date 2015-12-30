@@ -28,11 +28,11 @@ Game::Game(string input, int sessions)
 	elapsedTime = 0.0f;
 	boxPosition = -1.0f;
 	movingBar = false;
-	speeds[0] = 0.2f;
-	speeds[1] = 0.4f;
-	speeds[2] = 0.8f;
-	speeds[3] = 1.6f;
-	speeds[4] = 3.2f;
+	speeds[0] = 2.0f;
+	speeds[1] = 4.0f;
+	speeds[2] = 8.0f;
+	speeds[3] = 16.0f;
+	speeds[4] = 32.0f;
 
 	repetition = 1;
 
@@ -149,7 +149,7 @@ void Game::Init()
 
 	LightPosition = glm::vec3(-5, 19, -6.7);
 
-	text = new Text2D("../resources/calibri.ttf", "renderText");
+	text = new Text2D("../resources/OpenSans.ttf", "renderText");
 
 }
 
@@ -334,7 +334,7 @@ void Game::drawScene()
 	if (clickCounter > 0) {
 		elapsedTime += deltaTime;
 		if (elapsedTime > 10.0f) {
-			gameMode = (gameMode == FIRST_PRESENTATION ? SECOND_INTRODUCTION : SUMMARY);
+			//gameMode = (gameMode == FIRST_PRESENTATION ? SECOND_INTRODUCTION : SUMMARY);
 			elapsedTime = 0.0f;
 			clickCounter = 0;
 			boxPosition = 0.0f;
