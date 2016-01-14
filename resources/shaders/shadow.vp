@@ -12,13 +12,14 @@ uniform mat4 World;
 uniform mat4 View;
 uniform mat4 Projection;
 uniform vec3 LightPosition;
-uniform vec3 EyePosition;
 
 void main(void)
 {
 	mat4 wvp = Projection * View;
 	ex_Color = in_Color;
 	TexCoord = in_texCoord;
+	vec4 newPosition = in_Position;
+	newPosition.y += 10;
 	Normal = normalize(mat3x3(World)*in_Normal);
 	xPosition = World * vec4(in_Position.xyz, 1);
 	gl_Position = Projection * View * xPosition;

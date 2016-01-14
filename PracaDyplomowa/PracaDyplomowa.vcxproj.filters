@@ -63,6 +63,9 @@
     <ClInclude Include="Texture2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AnimationStep.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -105,6 +108,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationStep.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -170,5 +176,11 @@
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="..\resources\shaders\renderShadow.fp">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="..\resources\shaders\renderShadow.vp">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

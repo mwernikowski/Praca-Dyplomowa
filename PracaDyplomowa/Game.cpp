@@ -34,7 +34,11 @@ Game::Game(string input, int sessions)
 	speeds[3] = 16.0f;
 	speeds[4] = 32.0f;
 
-	repetition = 1;
+	experiment = true;
+
+	setExperiment();
+
+	gazeCenter = true;
 
 	firstSpeed = rand() % 5;
 	secondSpeed = rand() % 4;
@@ -110,6 +114,8 @@ void Game::Init()
 	currentLuminance = new RenderTarget2D();
 	adaptedRT = new RenderTarget2D();
 	changedLuminance = new RenderTarget2D();
+	shadow = new RenderTarget2D();
+	sceneWithShadows = new RenderTarget2D();
 
 	objectsDrawer = new Effect("drawObjects");
 	objectsDrawer->CreateShader();
@@ -157,65 +163,122 @@ void Game::Update()
 {
 	if (gameMode == FIRST_PRESENTATION || gameMode == SECOND_PRESENTATION)
 	{
-		glm::vec3 newPosition = camera->getPosition();
-		glm::vec3 newTarget = camera->getTarget();
-		bool changed = false;
-		float horizontalAngle = camera->getHorizontalAngle();
-		float verticalAngle = camera->getVerticalAngle();
+		if (experiment) {
+			if (steps.size()) {
+				AnimationStep* currentStep = steps.front();
+				int sign = (currentStep->isPositive() ? 1 : -1);
 
-		if (Keyboard::isPressed('W'))
-		{
-			newPosition.z -= deltaTime * playerSpeed * (float)cos(horizontalAngle * M_PI / 180.0);
-			newPosition.x -= deltaTime * playerSpeed * (float)sin(horizontalAngle * M_PI / 180.0);
-			changed = true;
+				if (currentStep->isRotation()) {
+					switch (currentStep->getDirection()) {
+					case 'x':
+						updateCameraAngles(0.0, sign * deltaTime * playerSpeed);
+						break;
+					case 'y':
+						updateCameraAngles(sign * deltaTime * playerSpeed, 0.0);
+						break;
+					case 'z':
+						updateCameraAngles(sign * deltaTime * playerSpeed / 1.414, sign * deltaTime * playerSpeed / 1.414);
+						break;
+					}
+				}
+				else {	
+					glm::vec3 newPosition = camera->getPosition();
+					glm::vec3 newTarget = camera->getTarget();
+					bool changed = false;
+					float horizontalAngle = camera->getHorizontalAngle();
+					float verticalAngle = camera->getVerticalAngle();
+
+					switch (currentStep->getDirection()) {
+					case 'x':
+						newPosition.z -= 0.2 * sign * deltaTime * playerSpeed * (float)cos(horizontalAngle * M_PI / 180.0);
+						newPosition.x -= 0.2 * sign * deltaTime * playerSpeed * (float)sin(horizontalAngle * M_PI / 180.0);
+						break;
+					case 'y':
+						newPosition.z += 0.2 * sign * deltaTime * playerSpeed * (float)cos((camera->getHorizontalAngle() + 90.0) * M_PI / 180.0);
+						newPosition.x += 0.2 * sign * deltaTime * playerSpeed * (float)sin((camera->getHorizontalAngle() + 90.0) * M_PI / 180.0);
+						break;
+					}
+
+					camera->setPosition(newPosition);
+					newTarget.z = newPosition.z - (float)cos(verticalAngle * M_PI / 180.0) * (float)cos(horizontalAngle * M_PI / 180.0);
+					newTarget.y = newPosition.y + (float)sin(verticalAngle * M_PI / 180.0);
+					newTarget.x = newPosition.x - (float)cos(verticalAngle * M_PI / 180.0) * (float)sin(horizontalAngle * M_PI / 180.0);
+					camera->setTarget(newTarget);
+				}
+				currentStep->move(deltaTime * playerSpeed);
+				if (currentStep->isFinished()) {
+					steps.pop();
+				}
+			}
+			else if (lightOn) {
+				lightOn = !lightOn;
+				clickCounter++;
+				if (clickCounter == 1) {
+					elapsedTime = 0.0f;
+				}
+			}
 		}
-		if (Keyboard::isPressed('S'))
-		{
-			newPosition.z += deltaTime * playerSpeed * (float)cos(horizontalAngle * M_PI / 180.0);
-			newPosition.x += deltaTime * playerSpeed * (float)sin(horizontalAngle * M_PI / 180.0);
-			changed = true;
-		}
-		if (Keyboard::isPressed('A'))
-		{
-			newPosition.z -= deltaTime * playerSpeed * (float)cos((horizontalAngle + 90.0) * M_PI / 180.0);
-			newPosition.x -= deltaTime * playerSpeed * (float)sin((horizontalAngle + 90.0) * M_PI / 180.0);
-			changed = true;
-		}
-		if (Keyboard::isPressed('D'))
-		{
-			newPosition.z += deltaTime * playerSpeed * (float)cos((camera->getHorizontalAngle() + 90.0) * M_PI / 180.0);
-			newPosition.x += deltaTime * playerSpeed * (float)sin((camera->getHorizontalAngle() + 90.0) * M_PI / 180.0);
-			changed = true;
-		}
-		if (Keyboard::isPressed(GLFW_KEY_UP))
-		{
-			updateCameraAngles(0.0, deltaTime * playerSpeed);
-			changed = true;
-		}
-		if (Keyboard::isPressed(GLFW_KEY_DOWN))
-		{
-			updateCameraAngles(0.0, -deltaTime * playerSpeed);
-			changed = true;
-		}
-		if (Keyboard::isPressed(GLFW_KEY_LEFT))
-		{
-			updateCameraAngles(deltaTime * playerSpeed, 0.0);
-			changed = true;
-		}
-		if (Keyboard::isPressed(GLFW_KEY_RIGHT))
-		{
-			updateCameraAngles(-deltaTime * playerSpeed, 0.0);
-			changed = true;
-		}
+		else {
+			glm::vec3 newPosition = camera->getPosition();
+			glm::vec3 newTarget = camera->getTarget();
+			bool changed = false;
+			float horizontalAngle = camera->getHorizontalAngle();
+			float verticalAngle = camera->getVerticalAngle();
+
+			if (Keyboard::isPressed('W'))
+			{
+				newPosition.z -= deltaTime * playerSpeed * (float)cos(horizontalAngle * M_PI / 180.0);
+				newPosition.x -= deltaTime * playerSpeed * (float)sin(horizontalAngle * M_PI / 180.0);
+				changed = true;
+			}
+			if (Keyboard::isPressed('S'))
+			{
+				newPosition.z += deltaTime * playerSpeed * (float)cos(horizontalAngle * M_PI / 180.0);
+				newPosition.x += deltaTime * playerSpeed * (float)sin(horizontalAngle * M_PI / 180.0);
+				changed = true;
+			}
+			if (Keyboard::isPressed('A'))
+			{
+				newPosition.z -= deltaTime * playerSpeed * (float)cos((horizontalAngle + 90.0) * M_PI / 180.0);
+				newPosition.x -= deltaTime * playerSpeed * (float)sin((horizontalAngle + 90.0) * M_PI / 180.0);
+				changed = true;
+			}
+			if (Keyboard::isPressed('D'))
+			{
+				newPosition.z += deltaTime * playerSpeed * (float)cos((camera->getHorizontalAngle() + 90.0) * M_PI / 180.0);
+				newPosition.x += deltaTime * playerSpeed * (float)sin((camera->getHorizontalAngle() + 90.0) * M_PI / 180.0);
+				changed = true;
+			}
+			if (Keyboard::isPressed(GLFW_KEY_UP))
+			{
+				updateCameraAngles(0.0, deltaTime * playerSpeed);
+				changed = true;
+			}
+			if (Keyboard::isPressed(GLFW_KEY_DOWN))
+			{
+				updateCameraAngles(0.0, -deltaTime * playerSpeed);
+				changed = true;
+			}
+			if (Keyboard::isPressed(GLFW_KEY_LEFT))
+			{
+				updateCameraAngles(deltaTime * playerSpeed, 0.0);
+				changed = true;
+			}
+			if (Keyboard::isPressed(GLFW_KEY_RIGHT))
+			{
+				updateCameraAngles(-deltaTime * playerSpeed, 0.0);
+				changed = true;
+			}
 
 
-		if (changed == true)
-		{
-			camera->setPosition(newPosition);
-			newTarget.z = newPosition.z - (float)cos(verticalAngle * M_PI / 180.0) * (float)cos(horizontalAngle * M_PI / 180.0);
-			newTarget.y = newPosition.y + (float)sin(verticalAngle * M_PI / 180.0);
-			newTarget.x = newPosition.x - (float)cos(verticalAngle * M_PI / 180.0) * (float)sin(horizontalAngle * M_PI / 180.0);
-			camera->setTarget(newTarget);
+			if (changed == true)
+			{
+				camera->setPosition(newPosition);
+				newTarget.z = newPosition.z - (float)cos(verticalAngle * M_PI / 180.0) * (float)cos(horizontalAngle * M_PI / 180.0);
+				newTarget.y = newPosition.y + (float)sin(verticalAngle * M_PI / 180.0);
+				newTarget.x = newPosition.x - (float)cos(verticalAngle * M_PI / 180.0) * (float)sin(horizontalAngle * M_PI / 180.0);
+				camera->setTarget(newTarget);
+			}
 		}
 	}
 
@@ -236,15 +299,35 @@ void Game::Update()
 
 	else if (gameMode == SUMMARY) {
 		if (Keyboard::isPressed(GLFW_KEY_SPACE)) {
-
+			int repetition = 1;
 			fstream results;
+			results.open("results.csv", ios::in);
+			
+			string name;
+			string token;
+			float firstSpeedInFile;
+			float secondSpeedInFile;
+
+			getline(results, token);
+			while (getline(results, name, ',')) {
+				getline(results, token, ',');
+				getline(results, token, ',');
+				getline(results, token, ',');
+				getline(results, token, ',');
+				firstSpeedInFile = stof(token);
+				getline(results, token, ',');
+				secondSpeedInFile = stof(token);
+				getline(results, token);
+				if (firstSpeedInFile == speeds[firstSpeed] && secondSpeedInFile == speeds[secondSpeed] && name == input)
+					repetition++;
+			}
+			results.close();
 			results.open("results.csv", ios::app);
+
 			results << input << "," << repetition << ",to_dark,room" <<
 				"," << speeds[firstSpeed] << "," << speeds[secondSpeed] << "," << boxPosition << endl;
 			results.close();
 			sessionsLeft--;
-
-			repetition++;
 			firstSpeed = rand() % 5;
 			secondSpeed = rand() % 4;
 			if (secondSpeed >= firstSpeed)
@@ -331,13 +414,19 @@ void Game::drawSummary()
 
 void Game::drawScene()
 {
-	if (clickCounter > 0) {
+	if (clickCounter > 0 && experiment) {
 		elapsedTime += deltaTime;
-		if (elapsedTime > 10.0f) {
-			//gameMode = (gameMode == FIRST_PRESENTATION ? SECOND_INTRODUCTION : SUMMARY);
+		if (elapsedTime > speeds[(gameMode == FIRST_PRESENTATION ? firstSpeed : secondSpeed)] * 1.5f + 5.0f) {
+			gameMode = (gameMode == FIRST_PRESENTATION ? SECOND_INTRODUCTION : SUMMARY);
 			elapsedTime = 0.0f;
 			clickCounter = 0;
 			boxPosition = 0.0f;
+			setExperiment();
+			lightOn = true;
+			camera->setPosition(glm::vec3(10, 13, 3));
+			camera->setTarget(glm::vec3(0, 0, 0));
+			camera->setHorizontalAngle(0.0f);
+			camera->setVerticalAngle(0.0f);
 		}
 	}
 	
@@ -386,19 +475,45 @@ void Game::drawScene()
 	toneCompressor->GetParameter("y")->SetValue(1.0f - mousePosition.y / WINDOW_HEIGHT);
 	toneCompressor->GetParameter("luminance")->SetValue(*currentLuminance);
 	drawSceneObjects(toneCompressor);
+
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	spriteDrawer->Apply();
 	spriteDrawer->GetParameter("tex")->SetValue(*adaptedRT);
+	spriteDrawer->GetParameter("eyeSymbol")->SetValue((float)experiment);
 	spriteDrawer->GetParameter("x")->SetValue(mousePosition.x / WINDOW_WIDTH);
 	spriteDrawer->GetParameter("y")->SetValue(1.0f - mousePosition.y / WINDOW_HEIGHT);
 	quad->Draw(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, spriteDrawer->GetParameter("World"));
 }
 
+void Game::setExperiment()
+{
+
+
+	ifstream experimentFile;
+	string line;
+	stringstream stream;
+	experimentFile.open("experiment.txt");
+	if (experimentFile.is_open()) {
+		while (getline(experimentFile, line)) {
+			AnimationStep* step = new AnimationStep();
+			bool rotation;
+			char direction;
+			float value;
+			bool positive;
+			stream << line;
+			stream >> rotation >> direction >> value >> positive;
+			stream.clear();
+			step->createAnimationStep(rotation, direction, value, positive);
+			steps.push(step);
+		}
+	}
+	experimentFile.close();
+}
+
 void Game::mouseMotion(double x, double y)
 {
-	mousePosition = glm::vec2(x, y);
 
 	if (gameMode == SUMMARY && movingBar) {
 
@@ -412,35 +527,43 @@ void Game::mouseMotion(double x, double y)
 			boxPosition = -1.0f;
 		else
 			boxPosition = 1.0f;
+
+		mousePosition = glm::vec2(x, y);
 	}
 
-	/*float angleHorizontal = camera->getHorizontalAngle();
-	float angleVertical = camera->getVerticalAngle();
+	else if (gazeCenter && !experiment) {
+		float angleHorizontal = camera->getHorizontalAngle();
+		float angleVertical = camera->getVerticalAngle();
 
-	angleHorizontal += (float)(WINDOW_WIDTH / 2 - x) * mouseSensitivity;
-	angleVertical += (float)(WINDOW_HEIGHT / 2 - y) * mouseSensitivity;
+		angleHorizontal += (float)(WINDOW_WIDTH / 2 - x) * mouseSensitivity;
+		angleVertical += (float)(WINDOW_HEIGHT / 2 - y) * mouseSensitivity;
 
-	if (angleHorizontal > 360.0f)
-		angleHorizontal -= 360.0f;
-	else if (angleHorizontal < 0.0f)
-		angleHorizontal += 360.0f;
+		if (angleHorizontal > 360.0f)
+			angleHorizontal -= 360.0f;
+		else if (angleHorizontal < 0.0f)
+			angleHorizontal += 360.0f;
 
-	if (angleVertical > 88.0f)
-		angleVertical = 88.0f;
-	else if (angleVertical < -88.0f)
-		angleVertical = -88.0f;
+		if (angleVertical > 88.0f)
+			angleVertical = 88.0f;
+		else if (angleVertical < -88.0f)
+			angleVertical = -88.0f;
 
-	camera->setHorizontalAngle(angleHorizontal);
-	camera->setVerticalAngle(angleVertical);
+		camera->setHorizontalAngle(angleHorizontal);
+		camera->setVerticalAngle(angleVertical);
 
-	glm::vec3 newTarget = camera->getTarget();
-	glm::vec3 position = camera->getPosition();
+		glm::vec3 newTarget = camera->getTarget();
+		glm::vec3 position = camera->getPosition();
 
-	newTarget.z = position.z - (float)cos(angleVertical * M_PI / 180.0) * (float)cos(angleHorizontal * M_PI / 180.0);
-	newTarget.y = position.y + (float)sin(angleVertical * M_PI / 180.0);
-	newTarget.x = position.x - (float)cos(angleVertical * M_PI / 180.0) * (float)sin(angleHorizontal * M_PI / 180.0);
-	camera->setTarget(newTarget);
-	*/
+		newTarget.z = position.z - (float)cos(angleVertical * M_PI / 180.0) * (float)cos(angleHorizontal * M_PI / 180.0);
+		newTarget.y = position.y + (float)sin(angleVertical * M_PI / 180.0);
+		newTarget.x = position.x - (float)cos(angleVertical * M_PI / 180.0) * (float)sin(angleHorizontal * M_PI / 180.0);
+		camera->setTarget(newTarget);
+		glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+		mousePosition = glm::vec2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+	}
+	else if (gameMode == SUMMARY) {
+		mousePosition = glm::vec2(x, y);
+	}
 }
 
 void Game::mouseClick(int button, int action)
@@ -534,6 +657,41 @@ void Game::drawSceneObjects(Effect *g)
 		{
 			g->GetParameter("matColor")->SetValue(glm::vec3(1.0f, 1.0f, 1.0f));
 			g->GetParameter("mode")->SetValue(10.0f);
+
+			g->GetParameter("World")->SetValue(
+				model->GetMesh(j)->getLocalWorld() *
+				glm::scale(glm::mat4(1.0f), model->getScale()) *
+				glm::rotate(glm::mat4(1.0f), theta, glm::vec3(0.0f, 1.0f, 0.0f)) *
+				glm::translate(glm::mat4(1.0f), model->getPosition()));
+
+			model->GetMesh(j)->Draw();
+		}
+	}
+}
+
+void Game::drawSceneDepth(Effect * g)
+{
+	g->GetParameter("View")->SetValue(light->getView());
+	g->GetParameter("Projection")->SetValue(light->getProjection());
+	g->GetParameter("LightPosition")->SetValue(light->getPosition());
+	g->GetParameter("EyePosition")->SetValue(camera->getPosition());
+	g->GetParameter("lightOn")->SetValue(lightOn ? 1.0f : 0.0f);
+	for (int i = 0; i < (int)sceneModels.size(); i++)
+	{
+		Model* model = sceneModels[i];
+		for (int j = 0; j < model->Elements(); j++)
+		{
+			g->GetParameter("matColor")->SetValue(model->GetMesh(j)->GetMaterial().Color);
+
+			if (model->GetMesh(j)->GetMaterial().texture != NULL)
+			{
+				g->GetParameter("mode")->SetValue(1.0f);
+				g->GetParameter("tex")->SetValue(*model->GetMesh(j)->GetMaterial().texture);
+			}
+			else
+			{
+				g->GetParameter("mode")->SetValue(-1.0f);
+			}
 
 			g->GetParameter("World")->SetValue(
 				model->GetMesh(j)->getLocalWorld() *

@@ -19,7 +19,7 @@ void main()
 {
 	float NdL = abs(dot(normalize(Normal), normalize(-xPosition.xyz + LightPosition)));
 	vec3 H = normalize(normalize(-xPosition.xyz + LightPosition));
-	float spec = clamp(pow(dot(normalize(Normal), H), 1.0f), 0.0, 0.2);
+	float spec = clamp(pow(dot(normalize(Normal), H), 1.0f), 0.0, 0.1);
 	vec4 vColor;
 	if (lightOn < 1.0f)
 		spec = 0.0f;
@@ -41,14 +41,14 @@ void main()
 		if (mode == 10.0f)
 			vColor = vec4(0,0,0,1);
 		else
-			vColor *= 0.1f;
+			vColor *= 0.1f + 0.1f;
 			vColor.r = vColor.g;
 			vColor.b = vColor.g;
 	}
 
 	vec3 color = vColor.rgb;
 	vec3 luminanceConvert = vec3(0.212656, 0.715158, 0.072186);
-	float compFactor = 0.01 * texture(luminance, vec2(0,0), 20).b + texture(luminance, vec2(0,0), 20).r;// / texture(luminance, vec2(0,0), 20).g + texture(luminance, vec2(0,0), 20).w / 10000.0;
+	float compFactor = 0.01 * texture(luminance, TexCoord, 20).b + texture(luminance, TexCoord, 20).r;// / texture(luminance, vec2(0,0), 20).g + texture(luminance, vec2(0,0), 20).w / 10000.0;
 	//compFactor = dot(luminanceConvert,  texture(luminance, TexCoord, 20).rgb);
 
 	

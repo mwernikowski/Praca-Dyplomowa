@@ -10,12 +10,11 @@ out vec4 outputColor;
 
 void main()
 {
-
-	float oldLuminance = texture(oldTexture, TexCoord, 20).r / texture(oldTexture, TexCoord, 20).g;
-	float aimLuminance = texture(aimTexture, TexCoord, 20).r / texture(aimTexture, TexCoord, 20).g;
+	float oldLuminance = texture2D(oldTexture, TexCoord, 20).r / texture2D(oldTexture, TexCoord, 20).g;
+	float aimLuminance = texture2D(aimTexture, TexCoord, 20).r / texture2D(aimTexture, TexCoord, 20).g;
 
 	float tauRod = speed;
-	float tauCone = 2.0f;
+	float tauCone = 1.0f;
 
 	float newLuminance = 0.0f;
 

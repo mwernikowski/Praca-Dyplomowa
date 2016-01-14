@@ -2,6 +2,7 @@
 
 Game *game;
 FT_Library freeType;
+GLFWwindow* window;
 
 void mouseMotionFunc(GLFWwindow* window, double x, double y)
 {
@@ -27,7 +28,6 @@ int main(int argc, char** argv)
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
-	GLFWwindow* window;
 	if (FULLSCREEN)
 		window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Praca dyplomowa", glfwGetPrimaryMonitor(), NULL);
 	else
@@ -70,6 +70,7 @@ int main(int argc, char** argv)
 	game = new Game(name, iters);
 	game->Init();
 	glfwSetCursorPosCallback(window, mouseMotionFunc);
+	glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
 	glfwSetMouseButtonCallback(window, mouseButtonFunc);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	Keyboard::KeyboardInit();

@@ -11,6 +11,8 @@ private:
 	RenderTarget2D* currentLuminance;
 	RenderTarget2D* adaptedRT;
 	RenderTarget2D* changedLuminance;
+	RenderTarget2D* shadow;
+	RenderTarget2D* sceneWithShadows;
 
 	vector<Model*> sceneModels;
 	vector<Model*> lightSources;
@@ -24,6 +26,7 @@ private:
 	Effect* textureCopier;
 	Effect* maskMultiplier;
 	Effect* barDrawer;
+	Effect* shadowRenderer;
 
 	Text2D* text;
 
@@ -47,15 +50,18 @@ private:
 	float boxPosition;
 
 	int sessionsLeft;
+	int nAnimations;
 
 	bool first;
 	bool lightOn;
 	bool movingBar;
+	bool gazeCenter;
+	bool experiment;
 
 	int firstSpeed, secondSpeed;
-	int repetition;
 
 	string input;
+	queue<AnimationStep*> steps;
 
 	GAME_MODE gameMode;
 
@@ -72,9 +78,11 @@ public:
 	void drawSecondIntroduction();
 	void drawSummary();
 	void Input();
+	void setExperiment();
 	void mouseMotion(double x, double y);
 	void mouseClick(int button, int action);
 	void drawSceneObjects(Effect* e);
+	void drawSceneDepth(Effect* e);
 	void updateCameraAngles(float angleHorizontalDelta, float angleVerticalDelta);
 };
 

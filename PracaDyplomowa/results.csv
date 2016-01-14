@@ -2,3 +2,14 @@ observer,repetition,condition_id,scene,param1,param2,score
 TEST,1,to_dark,room,3.2,0.2,-0.143159
 TEST,1,to_dark,room,1.6,0.4,0.102489
 TEST,1,to_dark,room,0.2,3.2,0
+TEST,1,to_dark,room,32,4,0.674769
+TEST,1,to_dark,room,4,8,0.050926
+TEST,1,to_dark,room,4,32,0.00925922
+TEST,1,to_dark,room,2,32,0.0787036
+TEST,1,to_dark,room,4,2,-0.190972
+TEST,1,to_dark,room,4,8,-0.299769
+TEST,1,to_dark,room,2,16,-0.363426
+TEST,1,to_dark,room,2,4,-1
+TEST,1,to_dark,room,16,4,1
+TEST,1,to_dark,room,4,16,0.5
+TEST,2,to_dark,room,16,4,0

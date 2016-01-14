@@ -158,6 +158,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimationStep.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Content.h" />
     <ClInclude Include="Effect.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="Texture2D.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AnimationStep.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Content.cpp" />
     <ClCompile Include="Effect.cpp" />
@@ -205,6 +207,8 @@
     <None Include="..\resources\shaders\multiplyMask.vp" />
     <None Include="..\resources\shaders\calculateLuminance.fp" />
     <None Include="..\resources\shaders\calculateLuminance.vp" />
+    <None Include="..\resources\shaders\renderShadow.fp" />
+    <None Include="..\resources\shaders\renderShadow.vp" />
     <None Include="..\resources\shaders\renderText.fp" />
     <None Include="..\resources\shaders\renderText.vp" />
     <None Include="..\resources\shaders\shadow.fp" />

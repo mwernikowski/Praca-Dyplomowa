@@ -11,6 +11,8 @@
 #include <tchar.h>
 #include <iostream>
 #include <vector>
+#include <list>
+#include <queue>
 #include <map>
 #include <ctime>
 #include <cmath>
@@ -40,11 +42,13 @@
 
 using namespace std;
 
-const int WINDOW_WIDTH = 1366;
-const int WINDOW_HEIGHT = 768;
-const bool FULLSCREEN = true;
+const int WINDOW_WIDTH = 1920;
+const int WINDOW_HEIGHT = 1080;
+const bool FULLSCREEN = false;
 
 enum GAME_MODE { FIRST_INTRODUCTION, FIRST_PRESENTATION, SECOND_INTRODUCTION, SECOND_PRESENTATION, SUMMARY };
+
+extern GLFWwindow* window;
 
 #include "Keyboard.h"
 #include "Texture2D.h"
@@ -57,4 +61,5 @@ enum GAME_MODE { FIRST_INTRODUCTION, FIRST_PRESENTATION, SECOND_INTRODUCTION, SE
 #include "Camera.h"
 #include "Content.h"
 #include "Text2D.h"
+#include "AnimationStep.h"
 #include "Game.h"
